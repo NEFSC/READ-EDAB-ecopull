@@ -27,7 +27,7 @@ jobs:
           
       - name: Test 
         run: |
-          Rscript -e 'install.packages("netcdf4")
+          Rscript -e 'install.packages("ncdf4")
           ncdf4::nc_open("https://psl.noaa.gov/thredds/catalog/Datasets/noaa.oisst.v2/catalog.html?dataset=Datasets/noaa.oisst.v2")
-          ncdf4::nc_open("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/icec.day.mean.2021.v2.nc")
+          ncdf4::nc_open("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/icec.day.mean.2021.v2.nc")'
   
