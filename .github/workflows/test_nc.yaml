@@ -3,39 +3,58 @@ on:
 
 name: Test .nc from API
 
-jobs: 
+jobs:
   build1:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GH_PAT }}
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-    
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
 
       - name: Install command line packages
-        run: |        
+        run: |
           sudo apt update
           sudo apt-get install  libgdal-dev libcurl4-gnutls-dev libgit2-dev libudunits2-dev libharfbuzz-dev libfribidi-dev
         shell: bash
-        
+
       - name: Set up R
         uses: r-lib/actions/setup-r@master
-        with: 
-          r-version: '4.0.3' # problem with using 4.0.4   
-          
+        with:
+          r-version: '4.0.3' # problem with using 4.0.4
+
       - name: Install packages
         run: |
           Rscript -e 'install.packages("ncdf4")'
-          
-      - name: Test 
+
+      - name: Test
         run: |
           Rscript -e '
-          #ncdf4::nc_open("https://psl.noaa.gov/thredds/catalog/Datasets/noaa.oisst.v2/catalog.html?dataset=Datasets/noaa.oisst.v2")
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/icec.day.mean.2021.v2.nc"
           download.file(url, "test.nc")
-          test <- ncdf4::nc_open("test.nc")
-          print(head(test))
-          print(test)'
-  
+
+          internet_ltm <- ncdf4::nc_open("test.nc")
+          usethis::use_data(internet_ltm)
+
+          years <- 2017:2021
+
+          for(i in years) {
+            url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", year, ".v2.nc")
+            download.file(url, desfile = paste0(year, ".nc"))
+
+            text <- knitr::knit_expand(text = "test_{{year}} <- ncdf4::nc_open('{{year}}.nc')
+                                       usethis::use_data(test_{{year}})",
+                                       year = i)
+            parse(text)
+
+          }'
+
+      - name: Deploy to Github
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          token: ${{ secrets.GH_PAT }}
+          branch: main # The branch the action should deploy to.
+          folder: . # The folder the action should deploy.
+          clean: false # Automatically remove deleted files from the deploy branch
