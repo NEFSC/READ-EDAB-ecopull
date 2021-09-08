@@ -54,7 +54,9 @@ jobs:
           }'
           
       - name: Check directory size
-        run: du -s
+        run: |
+          cd data
+          du -s
         shell: bash 
 
       - name: Deploy to Github
@@ -62,5 +64,5 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           branch: main # The branch the action should deploy to.
-          folder: . # The folder the action should deploy.
+          folder: data # The folder the action should deploy.
           clean: false # Automatically remove deleted files from the deploy branch
