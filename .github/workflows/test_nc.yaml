@@ -41,11 +41,11 @@ jobs:
           years <- 2017:2021
 
           for(i in years) {
+            name <- paste0(i, ".nc")
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
-            download.file(url, destfile = paste0(i, ".nc"))
+            download.file(url, destfile = name)
 
-            text <- knitr::knit_expand(text = "name = paste0({{year}}, '.nc')
-                                       test_{{year}} <- ncdf4::nc_open(name)
+            text <- knitr::knit_expand(text = "test_{{year}} <- ncdf4::nc_open(name)
                                        usethis::use_data(test_{{year}})
                                        ncdf4::nc_close(name)",
                                        year = i)
