@@ -5,41 +5,43 @@ ecodata_ltm <- ncdf4::nc_open("../../Downloads/sst.day.mean.ltm.1982-2010.nc")
 ### https://www.py4u.net/discuss/881476
 
 # read ncdf file
-nc<-ncdf4::nc_open("../../Downloads/sst.day.mean.ltm.1982-2010.nc")
+nc <- ncdf4::nc_open("../../Downloads/sst.day.mean.ltm.1982-2010.nc")
 
-# check which layer to use
+# check which variable to use
 nc$var[[2]]$name
 
 # extract variable name, size and dimension
 v <- nc$var[[2]]
 size <- v$varsize
 dims <- v$ndims
-nt <- size[dims]              # length of time dimension
-lat <- nc$dim$lat$vals   # latitude position
-lon <- nc$dim$lon$vals  # longitude position
+nt <- size[dims] # length of time dimension
+lat <- nc$dim$lat$vals # latitude position
+lon <- nc$dim$lon$vals # longitude position
 
 # read sst variable
-r<-list()
+r <- list()
 for (i in 1:nt) {
-  start <- rep(1,dims)     # begin with start=(1,1,...,1)
-  start[dims] <- i             # change to start=(1,1,...,i) to read    timestep i
-  count <- size                # begin with count=(nx,ny,...,nt), reads entire var
-  count[dims] <- 1             # change to count=(nx,ny,...,1) to read 1 tstep
+  start <- rep(1, dims) # begin with start=(1,1,...,1)
+  start[dims] <- i # change to start=(1,1,...,i) to read    timestep i
+  count <- size # begin with count=(nx,ny,...,nt), reads entire var
+  count[dims] <- 1 # change to count=(nx,ny,...,1) to read 1 tstep
 
-  dt<-ncdf4::ncvar_get(nc, varid = 'sst', start = start,
-                       count = count
-                       )
+  dt <- ncdf4::ncvar_get(nc,
+    varid = "sst", start = start,
+    count = count
+  )
 
   # convert to raster
-  r[i]<-raster::raster(dt,
-                       crs = "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0")
+  r[i] <- raster::raster(dt,
+    crs = "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+  )
 }
 
 # create layer stack with time dimension
-r<-raster::stack(r)
+r <- raster::stack(r)
 
 # not sure if this is necessary?
-raster::extent(r)<-raster::extent(c(range(lat), range(lon)))
+raster::extent(r) <- raster::extent(c(range(lat), range(lon)))
 
 ecodata_ltm <- r %>%
   raster::t() %>%
