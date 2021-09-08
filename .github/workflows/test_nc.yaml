@@ -48,7 +48,7 @@ jobs:
                                        test_{{year}} <- ncdf4::nc_open(name)
                                        usethis::use_data(test_{{year}})",
                                        year = i)
-            parse(text)
+            parse(text = text)
 
           }'
 
