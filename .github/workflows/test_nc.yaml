@@ -51,7 +51,7 @@ jobs:
                                        year = i)
 
             print(text)
-            parse(text = text)
+            eval(parse(text = text))
 
           }'
 
