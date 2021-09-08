@@ -36,7 +36,7 @@ jobs:
           download.file(url, "test.nc")
 
           internet_ltm <- ncdf4::nc_open("test.nc")
-          usethis::use_data(internet_ltm)
+          usethis::use_data(internet_ltm, overwrite = TRUE)
 
           years <- 2017:2021
 
