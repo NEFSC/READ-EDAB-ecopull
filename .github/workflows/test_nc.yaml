@@ -46,11 +46,16 @@ jobs:
 
             text <- knitr::knit_expand(text = "name = paste0({{year}}, '.nc')
                                        test_{{year}} <- ncdf4::nc_open(name)
-                                       usethis::use_data(test_{{year}})",
+                                       usethis::use_data(test_{{year}})
+                                       ncdf4::nc_close(name)",
                                        year = i)
             parse(text = text)
 
           }'
+          
+      - name: Check directory size
+        run: du -s
+        shell: bash 
 
       - name: Deploy to Github
         uses: JamesIves/github-pages-deploy-action@4.1.1
