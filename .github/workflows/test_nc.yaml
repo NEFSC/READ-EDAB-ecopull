@@ -38,9 +38,9 @@ jobs:
           internet_ltm <- ncdf4::nc_open("test.nc")
           usethis::use_data(internet_ltm)
 
-          years <- 2017:2021
+          year <- 2017:2021
 
-          for(i in years) {
+          for(i in year) {
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", year, ".v2.nc")
             download.file(url, desfile = paste0(year, ".nc"))
 
