@@ -47,6 +47,7 @@ jobs:
             text <- knitr::knit_expand(text = "test_{{year}} <- ncdf4::nc_open('{{year}}.nc')
                                        usethis::use_data(test_{{year}})",
                                        year = i)
+            print(text)
             parse(text = text)
 
           }'
