@@ -27,7 +27,7 @@ jobs:
 
       - name: Install packages
         run: |
-          Rscript -e 'install.packages(c("ncdf4", "knitr", "usethis"))'
+          Rscript -e 'install.packages(c("ncdf4", "knitr", "usethis", "raster"))'
 
       - name: Test
         run: |
@@ -45,7 +45,7 @@ jobs:
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
             download.file(url, destfile = name)
 
-            text <- knitr::knit_expand(text = readLines(here::here("inst/create_temps.R"),
+            text <- knitr::knit_expand(text = readLines(here::here("inst/create_temps.R")),
                                        year = i)
 
             print(text)
