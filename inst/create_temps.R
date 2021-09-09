@@ -1,21 +1,19 @@
 # open file
 nc <- ncdf4::nc_open(name)
 
-# only one var - no name
-#print(nc$var$name)
 print(nc)
-
+print(nc$var[[1]]$name)
 
 # size and dimension
-v <- nc
+v <- nc$var[[1]]
 size <- v$varsize
 dims <- v$ndims
 nt <- size[dims] # length of time dimension
 lat <- nc$dim$lat$vals # latitude position
 lon <- nc$dim$lon$vals # longitude position
 
-print(paste(size, dims, nt, sep = "XXX"))
-stop("printed netcdf info")
+#print(paste(size, dims, nt, sep = "XXX"))
+#stop("printed netcdf info")
 
 # read sst variable
 r <- list()
