@@ -5,7 +5,7 @@ nc <- ncdf4::nc_open(name)
 nc$var$name
 
 # extract variable name, size and dimension
-v <- nc$var[[2]]
+v <- nc$var
 size <- v$varsize
 dims <- v$ndims
 nt <- size[dims] # length of time dimension
