@@ -14,7 +14,7 @@ nt <- size[dims] # length of time dimension
 lat <- nc$dim$lat$vals # latitude position
 lon <- nc$dim$lon$vals # longitude position
 
-print(paste(c(size, dims, nt), sep = "XXX"))
+print(paste(size, dims, nt, sep = "XXX"))
 stop("printed netcdf info")
 
 # read sst variable
