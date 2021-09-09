@@ -1,3 +1,5 @@
+`%>%` <- magrittr::`%>%`
+
 # open file
 nc <- ncdf4::nc_open(name)
 
