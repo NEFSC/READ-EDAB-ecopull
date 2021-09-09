@@ -1,12 +1,13 @@
 # open file
 nc <- ncdf4::nc_open(name)
 
-# check var name
-print(nc$var$name)
-print(nc)
+# only one var - no name
+#print(nc$var$name)
+#print(nc)
 
-# extract variable name, size and dimension
-v <- nc$var
+
+# size and dimension
+v <- nc
 size <- v$varsize
 dims <- v$ndims
 nt <- size[dims] # length of time dimension
