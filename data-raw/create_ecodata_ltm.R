@@ -62,9 +62,11 @@ fall.ltm <- raster::stackApply(fall.ltm, indices = rep(1,raster::nlayers(fall.lt
 
 ## Join seasonal gridded mean raster layers in ltm stack
 ecodata_ltm <- raster::stack(winter.ltm, spring.ltm, summer.ltm, fall.ltm)
+raster::crs(ecodata_ltm) <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+ltm <- raster::crop(ecodata_ltm, raster::extent(280,300,30,50))
 
 print(ecodata_ltm)
 
-raster::plot(ecodata_ltm)
+raster::plot(ltm)
 
 usethis::use_data(ecodata_ltm, overwrite = TRUE)
