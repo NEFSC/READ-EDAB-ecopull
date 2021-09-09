@@ -1,8 +1,8 @@
 # open file
 nc <- ncdf4::nc_open(name)
 
-# check which variable to use
-nc$var[[2]]$name
+# check var name
+nc$var$name
 
 # extract variable name, size and dimension
 v <- nc$var[[2]]
