@@ -3,7 +3,7 @@ nc <- ncdf4::nc_open(name)
 
 # only one var - no name
 #print(nc$var$name)
-#print(nc)
+print(nc)
 
 
 # size and dimension
