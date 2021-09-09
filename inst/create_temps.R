@@ -16,9 +16,9 @@ lon <- nc$dim$lon$vals # longitude position
 
 # read sst variable
 r <- list()
-for (i in 1:nt) {
+for (j in 1:nt) {
   start <- rep(1, dims) # begin with start=(1,1,...,1)
-  start[dims] <- i # change to start=(1,1,...,i) to read    timestep i
+  start[dims] <- j # change to start=(1,1,...,i) to read    timestep i
   count <- size # begin with count=(nx,ny,...,nt), reads entire var
   count[dims] <- 1 # change to count=(nx,ny,...,1) to read 1 tstep
 
@@ -28,7 +28,7 @@ for (i in 1:nt) {
   )
 
   # convert to raster
-  r[i] <- raster::raster(dt,
+  r[j] <- raster::raster(dt,
     crs = "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
   )
 }

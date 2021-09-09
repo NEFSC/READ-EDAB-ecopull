@@ -57,7 +57,7 @@ jobs:
             text <- knitr::knit_expand(text = readLines(here::here("inst/create_temps.R")),
                                        year = i)
 
-            print(text)
+            # print(text)
             try(eval(parse(text = text)))
             print(paste("finished", i))
 
