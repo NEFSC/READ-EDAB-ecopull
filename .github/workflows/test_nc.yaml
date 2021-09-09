@@ -27,7 +27,7 @@ jobs:
 
       - name: Install packages
         run: |
-          Rscript -e 'install.packages(c("ncdf4", "knitr", "usethis", "raster"))'
+          Rscript -e 'install.packages(c("ncdf4", "knitr", "usethis", "raster", "here"))'
 
       - name: Test
         run: |
