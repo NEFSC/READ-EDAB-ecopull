@@ -14,6 +14,8 @@ nt <- size[dims] # length of time dimension
 lat <- nc$dim$lat$vals # latitude position
 lon <- nc$dim$lon$vals # longitude position
 
+print(c(head(v), size, dims, nt, lat, lon))
+
 # read sst variable
 r <- list()
 for (i in 1:nt) {
