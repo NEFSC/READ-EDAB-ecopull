@@ -2,7 +2,8 @@
 nc <- ncdf4::nc_open(name)
 
 # check var name
-nc$var$name
+print(nc$var$name)
+print(nc)
 
 # extract variable name, size and dimension
 v <- nc$var
