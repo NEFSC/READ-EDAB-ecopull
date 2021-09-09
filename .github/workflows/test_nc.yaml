@@ -45,9 +45,7 @@ jobs:
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
             download.file(url, destfile = name)
 
-            text <- knitr::knit_expand(text = "test_{{year}} <- ncdf4::nc_open(name)
-                                       usethis::use_data(test_{{year}})
-                                       ncdf4::nc_close(test_{{year}})",
+            text <- knitr::knit_expand(text = readLines(here::here("inst/create_temps.R"),
                                        year = i)
 
             print(text)
