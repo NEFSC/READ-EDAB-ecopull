@@ -33,7 +33,7 @@ jobs:
         run: |
           Rscript -e '
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/icec.day.mean.2021.v2.nc"
-          download.file(url, "test.nc")
+          download.file(url, "test.nc", timeout = 600)
 
           internet_ltm <- ncdf4::nc_open("test.nc")
           usethis::use_data(internet_ltm, overwrite = TRUE)
@@ -43,7 +43,7 @@ jobs:
           for(i in years) {
             name <- paste0(i, ".nc")
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
-            download.file(url, destfile = name)
+            download.file(url, destfile = name, timeout = 600)
 
             text <- knitr::knit_expand(text = readLines(here::here("inst/create_temps.R")),
                                        year = i)
