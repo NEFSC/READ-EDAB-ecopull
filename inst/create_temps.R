@@ -3,8 +3,8 @@
 # open file
 nc <- ncdf4::nc_open(name)
 
-print(nc)
-print(nc$var[[1]]$name)
+# print(nc)
+# print(nc$var[[1]]$name)
 
 # size and dimension
 v <- nc$var[[1]]
@@ -13,9 +13,6 @@ dims <- v$ndims
 nt <- size[dims] # length of time dimension
 lat <- nc$dim$lat$vals # latitude position
 lon <- nc$dim$lon$vals # longitude position
-
-#print(paste(size, dims, nt, sep = "XXX"))
-#stop("printed netcdf info")
 
 # read sst variable
 r <- list()
@@ -64,7 +61,7 @@ r <- raster::stack(winter, spring, summer, fall)
 raster::crs(r) <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 ne_data <- raster::crop(r, raster::extent(280, 300, 30, 50))
 
-print(ne_data)
+# print(ne_data)
 
 # raster::plot(ne_data)
 
