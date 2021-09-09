@@ -47,6 +47,22 @@ ecodata_ltm <- r %>%
   raster::t() %>%
   raster::flip(direction = "y")
 
+## get seasonal gridded means
+winter.ltm <- ecodata_ltm[[1:90]]
+winter.ltm <- raster::stackApply(winter.ltm, indices = rep(1,raster::nlayers(winter.ltm)),mean)
+
+spring.ltm <- ecodata_ltm[[91:181]]
+spring.ltm <- raster::stackApply(spring.ltm, indices = rep(1,raster::nlayers(spring.ltm)),mean)
+
+summer.ltm <- ecodata_ltm[[182:273]]
+summer.ltm <- raster::stackApply(summer.ltm, indices = rep(1,raster::nlayers(summer.ltm)),mean)
+
+fall.ltm <- ecodata_ltm[[274:365]]
+fall.ltm <- raster::stackApply(fall.ltm, indices = rep(1,raster::nlayers(fall.ltm)),mean)
+
+## Join seasonal gridded mean raster layers in ltm stack
+ecodata_ltm <- raster::stack(winter.ltm, spring.ltm, summer.ltm, fall.ltm)
+
 print(ecodata_ltm)
 
 raster::plot(ecodata_ltm)
