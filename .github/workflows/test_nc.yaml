@@ -48,12 +48,14 @@ jobs:
           Rscript -e '
           devtools::load_all()
 
-          url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/icec.day.mean.2021.v2.nc"
+          url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
           download.file(url, "test.nc", timeout = 600)
 
           nc <- ncdf4::nc_open("test.nc")
           print(nc)
           print(nc$var[[2]]$name)
+
+          message("trying function")
 
           internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 2)
           usethis::use_data(internet_ltm, overwrite = TRUE)
