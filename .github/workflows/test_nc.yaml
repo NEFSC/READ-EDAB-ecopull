@@ -47,9 +47,10 @@ jobs:
         run: |
           Rscript -e '
           devtools::load_all()
+          options(timeout = 600)
 
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
-          download.file(url, "test.nc", timeout = 600)
+          download.file(url, "test.nc")
           print(file.size(test.nc))
 
           nc <- ncdf4::nc_open("test.nc")
@@ -63,7 +64,7 @@ jobs:
 
           # duplicate
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
-          download.file(url, "test.nc", timeout = 600)
+          download.file(url, "test.nc")
           print(file.size(test.nc))
 
           nc <- ncdf4::nc_open("test.nc")
