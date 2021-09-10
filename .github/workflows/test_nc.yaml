@@ -52,6 +52,9 @@ jobs:
           download.file(url, "test.nc", timeout = 600)
 
           nc <- ncdf4::nc_open("test.nc")
+          print(nc)
+          print(nc$var[[2]]$name)
+
           internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 2)
           usethis::use_data(internet_ltm, overwrite = TRUE)
           ncdf4::nc_close(nc)
