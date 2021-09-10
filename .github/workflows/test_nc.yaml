@@ -37,12 +37,13 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           Rscript -e '
-          install.packages(c("ncdf4", "knitr", "usethis", "raster", "here"))
-          devtools::load_all()'
+          install.packages(c("ncdf4", "knitr", "usethis", "raster", "here"))'
 
       - name: Test
         run: |
           Rscript -e '
+          devtools::load_all()
+
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/icec.day.mean.2021.v2.nc"
           download.file(url, "test.nc", timeout = 600)
 
