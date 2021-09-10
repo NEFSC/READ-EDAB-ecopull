@@ -51,7 +51,7 @@ jobs:
 
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
           download.file(url, "test.nc")
-          print(file.size(test.nc))
+          print(file.size("test.nc"))
 
           nc <- ncdf4::nc_open("test.nc")
           print(object.size(nc))
@@ -65,7 +65,7 @@ jobs:
           # duplicate
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
           download.file(url, "test.nc")
-          print(file.size(test.nc))
+          print(file.size("test.nc"))
 
           nc <- ncdf4::nc_open("test.nc")
           print(object.size(nc))
