@@ -1,6 +1,6 @@
 on:
   workflow_dispatch:
-  push:
+#  push:
 
 name: Test .nc from API
 
