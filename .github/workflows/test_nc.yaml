@@ -39,17 +39,20 @@ jobs:
           Rscript -e '
           install.packages(c("ncdf4", "knitr", "usethis", "raster", "here"))'
 
-      - name: Test
+      - name: Install more packages
         run: |
           Rscript -e '
           install.packages("devtools")
-          devtools::load_all()
+          devtools::load_all()'
 
+      - name: Test
+        run: |
+          Rscript -e '
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/icec.day.mean.2021.v2.nc"
           download.file(url, "test.nc", timeout = 600)
 
           nc <- ncdf4::nc_open("test.nc")
-          internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 1)
+          internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 2)
           usethis::use_data(internet_ltm, overwrite = TRUE)
           ncdf4::nc_close(nc)
 
