@@ -52,13 +52,8 @@ jobs:
           download.file(url, "test.nc", timeout = 600)
 
           nc <- ncdf4::nc_open("test.nc")
-          print(nc)
-          print(nc$var[[2]]$name)
-
-          message("trying function")
-
-          internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 2)
-          usethis::use_data(internet_ltm, overwrite = TRUE)
+          internet_ltm_2 <- ecopull::nc_to_raster(nc = nc, varnum = 2)
+          usethis::use_data(internet_ltm_2, overwrite = TRUE)
           ncdf4::nc_close(nc)
 
           years <- 2017:2021
@@ -69,8 +64,8 @@ jobs:
             download.file(url, destfile = name, timeout = 600)
 
             text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
-                                              test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
-                                              usethis::use_data(test_{{year}}, overwrite = TRUE)
+                                              test_{{year}}_2 <- ecopull::nc_to_raster(nc = nc, varnum = 1)
+                                              usethis::use_data(test_{{year}}_2, overwrite = TRUE)
                                               ncdf4::nc_close(nc)",
                                        year = i)
 
