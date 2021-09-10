@@ -23,7 +23,8 @@ for (j in 1:nt) {
   count[dims] <- 1 # change to count=(nx,ny,...,1) to read 1 tstep
 
   dt <- ncdf4::ncvar_get(nc,
-    varid = "sst", start = start,
+    varid = "sst",
+    start = start,
     count = count
   )
 
