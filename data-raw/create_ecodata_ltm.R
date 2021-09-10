@@ -8,6 +8,8 @@ nc <- ncdf4::nc_open("../../Downloads/sst.day.mean.ltm.1982-2010.nc")
 # check which variable to use
 nc$var[[2]]$name
 
+ecopull::nc_to_raster(nc, varnum = 2)
+
 # extract variable name, size and dimension
 v <- nc$var[[2]]
 size <- v$varsize
