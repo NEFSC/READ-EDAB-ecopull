@@ -79,7 +79,7 @@ jobs:
                                               ncdf4::nc_close(nc)",
                                        year = i)
 
-            # print(text)
+            print(text)
             try(eval(parse(text = text)))
             print(paste("finished", i))
 
