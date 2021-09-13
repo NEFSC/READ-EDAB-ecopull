@@ -59,7 +59,8 @@ jobs:
           internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 2)
           message("raster object size: ", object.size(internet_ltm))
 
-          usethis::use_data(internet_ltm, overwrite = TRUE)
+          saveRDS(internet_ltm, here::here("data-raw","gridded", "ltm", "internet_ltm.RDS"))
+          #usethis::use_data(internet_ltm, overwrite = TRUE)
           ncdf4::nc_close(nc)
 
           years <- 2017:2021
@@ -71,11 +72,12 @@ jobs:
 
             text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
                                               test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
-                                              usethis::use_data(test_{{year}}, overwrite = TRUE)
+                                              saveRDS(internet_ltm, here::here("data-raw","gridded", "sst_data", "test_{{year}}.RDS"))
+                                              #usethis::use_data(test_{{year}}, overwrite = TRUE)
                                               ncdf4::nc_close(nc)",
                                        year = i)
 
-             print(text)
+            # print(text)
             try(eval(parse(text = text)))
             print(paste("finished", i))
 
@@ -83,7 +85,7 @@ jobs:
 
       - name: Check directory size
         run: |
-          cd data
+          cd data-raw
           du -s
         shell: bash
 
@@ -92,6 +94,6 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           branch: main # The branch the action should deploy to.
-          folder: data # The folder the action should deploy.
-          target-folder: data
+          folder: data-raw # The folder the action should deploy.
+          target-folder: data-raw
           clean: false # Automatically remove deleted files from the deploy branch
