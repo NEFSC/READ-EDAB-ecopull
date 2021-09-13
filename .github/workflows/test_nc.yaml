@@ -68,13 +68,16 @@ jobs:
 
           for(i in years) {
             name <- paste0(i, ".nc")
+            dir.create(here::here("data-raw","gridded", "sst_data"), recursive = TRUE)
+            filename <- here::here("data-raw","gridded", "sst_data", paste0("test_", i, ".RDS"))
+
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
             download.file(url, destfile = name, timeout = 600)
 
             text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
                                               test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
-                                              dir.create(here::here('data-raw','gridded', 'sst_data'), recursive = TRUE)
-                                              saveRDS(test_{{year}}, file = here::here('data-raw','gridded', 'sst_data', 'test_{{year}}.RDS'))
+
+                                              saveRDS(test_{{year}}, file = filename)
                                               #usethis::use_data(test_{{year}}, overwrite = TRUE)
                                               ncdf4::nc_close(nc)",
                                        year = i)
