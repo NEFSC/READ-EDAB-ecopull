@@ -41,7 +41,7 @@ jobs:
 
       - name: Install more packages
         run: |
-          Rscript -e 'install.packages(c("devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr")
+          Rscript -e 'install.packages(c("devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
           devtools::install_github("NOAA-EDAB/ecodata") '
 
 #       - name: Pull satellite data
