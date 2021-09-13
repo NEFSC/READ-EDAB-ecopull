@@ -31,18 +31,15 @@ jobs:
         id: cache
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ecopull-cache
+          key: ecopull-cache2
 
       - name: Install packages
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           Rscript -e '
-          install.packages(c("ncdf4", "knitr", "usethis", "raster", "here"))'
-
-      - name: Install more packages
-        run: |
-          Rscript -e 'install.packages(c("devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
-          devtools::install_github("NOAA-EDAB/ecodata") '
+          install.packages(c("ncdf4", "knitr", "usethis", "raster", "here",
+          "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
+          devtools::install_github("NOAA-EDAB/ecodata")'
 
 #       - name: Pull satellite data
       #   run: |
