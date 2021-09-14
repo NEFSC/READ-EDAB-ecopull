@@ -58,7 +58,7 @@ jobs:
           message("raster object size: ", object.size(internet_ltm))
 
           dir.create(here::here("data-raw","gridded", "ltm"), recursive = TRUE)
-          raster::saveStack(internet_ltm, filename = here::here("data-raw","gridded", "ltm", "internet_ltm"))
+          raster::stackSave(internet_ltm, filename = here::here("data-raw","gridded", "ltm", "internet_ltm"))
           # saveRDS(internet_ltm, file = here::here("data-raw","gridded", "ltm", "internet_ltm.RDS"))
           ncdf4::nc_close(nc)
 
@@ -74,7 +74,7 @@ jobs:
 
             text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
                                               test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
-                                              raster::saveStack(internet_ltm, filename = filename)
+                                              raster::stackSave(internet_ltm, filename = filename)
                                               # saveRDS(test_{{year}}, file = filename)
                                               ncdf4::nc_close(nc)",
                                        year = i)
