@@ -35,7 +35,7 @@ seasonal_oisst_anom_nc <-"internet_ltm.grd"
 #Get long-term mean for anomaly calculation
 ltm <- raster::stack(file.path(ltm.dir,seasonal_oisst_anom_nc))
 
-#ltm <- raster::stack(internet_ltm)
+ltm <- raster::stack(internet_ltm)
 
 # already rotated and cropped
 #ltm <- raster::stack(nc)
