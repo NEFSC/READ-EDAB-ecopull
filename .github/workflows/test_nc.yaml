@@ -38,7 +38,7 @@ jobs:
         run: |
           Rscript -e '
           install.packages(c("ncdf4", "knitr", "usethis", "raster", "rgdal",
-          here", "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
+          "here", "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
           devtools::install_github("NOAA-EDAB/ecodata")'
 
 #       - name: Pull satellite data
