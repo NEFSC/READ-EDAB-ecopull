@@ -35,7 +35,7 @@ seasonal_oisst_anom_nc <-"internet_ltm.grd"
 #Get long-term mean for anomaly calculation
 ltm <- raster::stack(file.path(ltm.dir,seasonal_oisst_anom_nc))
 
-#ltm <- raster::stack(internet_ltm)
+ltm <- raster::stack(internet_ltm)
 
 # already rotated and cropped
 #ltm <- raster::stack(nc)
@@ -59,12 +59,12 @@ fall.ltm <- raster::stackApply(fall.ltm, indices = rep(1,nlayers(fall.ltm)),mean
 
 get_group_mean <- function(fname, epu_name, anom = T){
 
-  #Import raster data
+  #Import raster data ----
   raw <- raster::stack(file.path(raw.dir, fname))
 
   crs(raw) <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 
-  #Get layer index and map to year
+  #Get layer index and map to year ----
   message('Getting index')
   year <- NULL
   for (i in 1:nlayers(raw)){
@@ -92,11 +92,11 @@ get_group_mean <- function(fname, epu_name, anom = T){
     message("NA in year")
   }
 
-  #Rotate from 0-360 to -180-180
+  #Rotate from 0-360 to -180-180 ----
   message(paste('Rotating',fname))
   raw1 <- rotate(raw)
 
-  #Split data on layer index - stackApply will break if there are too many layers
+  #Split data on layer index - stackApply will break if there are too many layers ----
   g1 <- year_split %>%
     dplyr::filter(index %in% unique(.$index)[1:10]) %>%
     pull(index)
@@ -105,18 +105,23 @@ get_group_mean <- function(fname, epu_name, anom = T){
     dplyr::filter(!index %in% unique(.$index)[1:10]) %>%
     pull(index)
 
-  #Apply and combine
+  #Apply and combine ----
   message(paste('Finding mean'))
   n <- raster::nlayers(raw1)
   rawMean1 <- raster::stackApply(raw1[[1:length(g1)]], indices = g1, mean)
-  rawMean2 <- raster::stackApply(raw1[[(length(g1) + 1):n]], indices = g2, mean)
-  rawMean <- raster::stack(rawMean1,rawMean2)
+  if(length(g2) > 0){
+    rawMean2 <- raster::stackApply(raw1[[(length(g1) + 1):n]], indices = g2, mean)
+    rawMean <- raster::stack(rawMean1,rawMean2)
+  } else {
+    rawMean <- rawMean1
+  }
 
-  #Mask output to EPU
+
+  #Mask output to EPU ----
   message(paste('Masking to',epu_name))
   out <- raster::mask(rawMean, epu[epu$EPU == epu_name,])
 
-  #Find seasonal anomaly
+  #Find seasonal anomaly ----
   mean_sst <- NULL
   for (i in 1:nlayers(out)){
 
@@ -143,7 +148,7 @@ get_group_mean <- function(fname, epu_name, anom = T){
 }
 
 #get sst
-fname <- list.files(raw.dir)
+fname <- stringr::str_subset(list.files(raw.dir), pattern = ".grd")
 
 MAB <- NULL
 GOM <- NULL

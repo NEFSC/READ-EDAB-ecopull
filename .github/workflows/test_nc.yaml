@@ -41,7 +41,7 @@ jobs:
           "here", "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
           devtools::install_github("NOAA-EDAB/ecodata")'
 
-      # - name: Pull satellite data
+#      # - name: Pull satellite data
       #   run: |
       #     Rscript -e '
       #     devtools::load_all()
