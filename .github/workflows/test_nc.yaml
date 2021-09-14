@@ -41,47 +41,49 @@ jobs:
           "here", "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
           devtools::install_github("NOAA-EDAB/ecodata")'
 
-#       - name: Pull satellite data
-      #   run: |
-      #     Rscript -e '
-      #     devtools::load_all()
-      #     options(timeout = 600)
-      #
-      #     url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
-      #     download.file(url, "test.nc")
-      #     message("File size: ", file.size("test.nc"))
-      #
-      #     nc <- ncdf4::nc_open("test.nc")
-      #     message("netcdf object size: ", object.size(nc))
-      #
-      #     internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 2)
-      #     message("raster object size: ", object.size(internet_ltm))
-      #
-      #     dir.create(here::here("data-raw","gridded", "ltm"), recursive = TRUE)
-      #     saveRDS(internet_ltm, file = here::here("data-raw","gridded", "ltm", "internet_ltm.RDS"))
-      #     ncdf4::nc_close(nc)
-      #
-      #     years <- 2017:2021
-      #
-      #     for(i in years) {
-      #       name <- paste0(i, ".nc")
-      #       dir.create(here::here("data-raw","gridded", "sst_data"), recursive = TRUE)
-      #       filename <- here::here("data-raw","gridded", "sst_data", paste0("test_", i, ".RDS"))
-      #
-      #       url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
-      #       download.file(url, destfile = name, timeout = 600)
-      #
-      #       text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
-      #                                         test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
-      #                                         saveRDS(test_{{year}}, file = filename)
-      #                                         ncdf4::nc_close(nc)",
-      #                                  year = i)
-      #
-      #       # print(text)
-      #       try(eval(parse(text = text)))
-      #       print(paste("finished", i))
-      #
-      #     }'
+      - name: Pull satellite data
+        run: |
+          Rscript -e '
+          devtools::load_all()
+          options(timeout = 600)
+
+          url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
+          download.file(url, "test.nc")
+          message("File size: ", file.size("test.nc"))
+
+          nc <- ncdf4::nc_open("test.nc")
+          message("netcdf object size: ", object.size(nc))
+
+          internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 2)
+          message("raster object size: ", object.size(internet_ltm))
+
+          dir.create(here::here("data-raw","gridded", "ltm"), recursive = TRUE)
+          raster::saveStack(internet_ltm, filename = here::here("data-raw","gridded", "ltm", "internet_ltm"))
+          # saveRDS(internet_ltm, file = here::here("data-raw","gridded", "ltm", "internet_ltm.RDS"))
+          ncdf4::nc_close(nc)
+
+          years <- 2017:2021
+
+          for(i in years) {
+            name <- paste0(i, ".nc")
+            dir.create(here::here("data-raw","gridded", "sst_data"), recursive = TRUE)
+            filename <- here::here("data-raw","gridded", "sst_data", paste0("test_", i, ".RDS"))
+
+            url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
+            download.file(url, destfile = name, timeout = 600)
+
+            text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
+                                              test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
+                                              raster::saveStack(internet_ltm, filename = filename)
+                                              # saveRDS(test_{{year}}, file = filename)
+                                              ncdf4::nc_close(nc)",
+                                       year = i)
+
+            # print(text)
+            try(eval(parse(text = text)))
+            print(paste("finished", i))
+
+          }'
 
       - name: Mask satellite data and save
         run: |
