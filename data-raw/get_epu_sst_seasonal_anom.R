@@ -18,7 +18,7 @@ library(stringr)
 
 
 raw.dir <- here::here("data-raw","gridded","sst_data")
-ltm.dir <- here::here("data")
+ltm.dir <- here::here("data-raw","gridded","ltm")
 
 epu <- ecodata::epu_sf %>%
   filter(EPU != "SS")
@@ -30,12 +30,17 @@ seasonal_epu_ltm <- function(ltm, epu_name){
   return(ltm_out)
 }
 
-seasonal_oisst_anom_nc <-"internet_ltm.rda"
+seasonal_oisst_anom_nc <-"internet_ltm.grd"
 
 #Get long-term mean for anomaly calculation
 ltm <- raster::stack(file.path(ltm.dir,seasonal_oisst_anom_nc))
-ltm <- raster::crop(ltm, extent(280,300,30,50))
-ltm <- raster::rotate(ltm)
+
+ltm <- raster::stack(internet_ltm)
+
+# already rotated and cropped
+#ltm <- raster::stack(nc)
+#ltm <- raster::crop(ltm, extent(280,300,30,50))
+#ltm <- raster::rotate(ltm)
 
 winter.ltm <- ltm[[1:90]]
 winter.ltm <- raster::stackApply(winter.ltm, indices = rep(1,nlayers(winter.ltm)),mean)
