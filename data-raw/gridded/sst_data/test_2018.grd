@@ -1,0 +1,25 @@
+[general]
+creator=R package 'raster'
+created=2021-09-14 15:02:37
+[georeference]
+nrows=80
+ncols=80
+xmin=279.930555555556
+ymin=29.9583333333333
+xmax=299.916666666667
+ymax=49.9305555555556
+projection=+proj=longlat +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0
+[data]
+datatype=FLT4S
+byteorder=little
+nbands=4
+bandorder=BIL
+minvalue=-1.35033333301544:2.72252750396729:8.12206502582716:2.02999997138977
+maxvalue=24.7135543823242:26.8352737426758:29.5463036868883:27.4823913574219
+nodatavalue=-3.4e+38
+[legend]
+legendtype=
+values=
+color=
+[description]
+layername=index_1.1:index_1.2:index_1.3:index_1.4
