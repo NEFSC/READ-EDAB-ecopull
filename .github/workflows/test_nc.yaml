@@ -37,8 +37,8 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           Rscript -e '
-          install.packages(c("ncdf4", "knitr", "usethis", "raster", "here",
-          "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
+          install.packages(c("ncdf4", "knitr", "usethis", "raster", "rgdal",
+          here", "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
           devtools::install_github("NOAA-EDAB/ecodata")'
 
 #       - name: Pull satellite data
@@ -86,8 +86,8 @@ jobs:
       - name: Mask satellite data and save
         run: |
           Rscript -e '
-          source(here::here("data-raw", "get_epu_sst_seasonal_anom.R"))
-          source(here::here("data-raw", "get_esp_sst_seasonal_anom.R"))'
+          try(source(here::here("data-raw", "get_epu_sst_seasonal_anom.R")))
+          try(source(here::here("data-raw", "get_esp_sst_seasonal_anom.R")))'
 
       - name: Check directory size
         run: |
