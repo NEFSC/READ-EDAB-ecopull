@@ -1,3 +1,18 @@
+#' Create null objects
+#'
+#' This function creates null objects from a vector of names
+#' @param names Vector of names to be turned into null objects
+#' @return Null objects saved into the working environment
+#' @export
+
+create_null <- function(names){
+  for(i in names){
+    text <- knitr::knit_expand(text = "{{name}} <<- NULL",
+                               name = i)
+    eval(parse(text = text))
+  }
+}
+
 #' Convert netcdf to raster
 #'
 #' This function converts a netcdf object to a raster object

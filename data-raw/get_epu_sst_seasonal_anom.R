@@ -54,7 +54,7 @@ summer.ltm <- raster::stackApply(summer.ltm, indices = rep(1,nlayers(summer.ltm)
 fall.ltm <- ltm[[274:365]]
 fall.ltm <- raster::stackApply(fall.ltm, indices = rep(1,nlayers(fall.ltm)),mean)
 
-fname <- "test_2017.grd"
+# fname <- "test_2017.grd"
 #Function to get seasonal averages by year
 
 get_group_mean <- function(fname, epu_name, anom = T){
@@ -162,7 +162,8 @@ for (e in epu_list){
   message(e)
   for (i in 1:4){
     message(fname[i])
-    assign(e,rbind(get(e),get_group_mean(fname = fname[i], epu_name = e, anom = TRUE)))
+    assign(e, rbind(get(e),
+                   get_group_mean(fname = fname[i], epu_name = e, anom = TRUE)))
   }
 }
 
