@@ -60,15 +60,15 @@ jobs:
           dir.create(here::here("data-raw","gridded", "ltm"), recursive = TRUE)
           raster::writeRaster(internet_ltm, filename = here::here("data-raw","gridded", "ltm", "internet_ltm.grd"),
                     overwrite=TRUE)
-          # saveRDS(internet_ltm, file = here::here("data-raw","gridded", "ltm", "internet_ltm.RDS"))
           ncdf4::nc_close(nc)
+          unlink("test.nc") # remove nc file to save space
 
           years <- 1981:2009
 
           for(i in years) {
             name <- paste0(i, ".nc")
             dir.create(here::here("data-raw","gridded", "sst_data"), recursive = TRUE)
-            filename <- here::here("data-raw","gridded", "sst_data", paste0("test_", i, ".RDS"))
+            filename <- here::here("data-raw","gridded", "sst_data", paste0("test_", i, ".grd"))
 
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
             download.file(url, destfile = name, timeout = 600)
@@ -76,12 +76,12 @@ jobs:
             text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
                                               test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
                                               raster::writeRaster(test_{{year}}, filename = filename, overwrite=TRUE)
-                                              # saveRDS(test_{{year}}, file = filename)
                                               ncdf4::nc_close(nc)",
                                        year = i)
 
             # print(text)
             try(eval(parse(text = text)))
+            unlink(name) # remove nc file to save space
             print(paste("finished", i))
 
           }'
