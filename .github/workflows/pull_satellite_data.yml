@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
 #  push:
 
-name: Pull satellice temperature data from PSL API
+name: Pull satellite temperature data from PSL API
 
 jobs:
   build1:
