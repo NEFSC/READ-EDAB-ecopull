@@ -131,8 +131,8 @@ plt <- ggplot2::ggplot(out_table,
   ggplot2::xlab("Magnitude of difference") +
   ggplot2::ylim(c(0,11)) +
   ggplot2::labs(title = "Comparison of old and new OISST anomaly values, 2010-2021") +
-  ggplot2::facet_grid(rows = ggplot2::vars(Var)) #,
-  #                    rows = ggplot2::vars(EPU))
+  ggplot2::facet_grid(rows = ggplot2::vars(Var))
 plt
 
+ggsave("histogram_comparison.png")
 

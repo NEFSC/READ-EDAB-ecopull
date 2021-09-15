@@ -160,7 +160,7 @@ GB <- NULL
 epu_list <- c("MAB","GOM","GB")
 for (e in epu_list){
   message(e)
-  for (i in 1:4){
+  for (i in 1:length(fname)){
     message(fname[i])
     assign(e, rbind(get(e),
                    get_group_mean(fname = fname[i], epu_name = e, anom = TRUE)))

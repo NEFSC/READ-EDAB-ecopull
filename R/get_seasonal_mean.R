@@ -145,11 +145,11 @@ get_group_mean <- function(ltm_path,
   return(mean_sst)
 }
 
-get_group_mean(ltm_path = here::here("data-raw","gridded","ltm", "internet_ltm.grd"),
-               fname = here::here("data-raw","gridded","sst_data", "test_2017.grd"),
-               region_name = "MAB")
-
-get_group_mean(ltm_path = here::here("data-raw","gridded","ltm", "internet_ltm.grd"),
-               fname = here::here("data-raw","gridded","sst_data", "test_2017.grd"),
-               shapefiles = ecodata::ESP_sf,
-               region_name = "atlantic_menhaden_south_spring")
+# get_group_mean(ltm_path = here::here("data-raw","gridded","ltm", "internet_ltm.grd"),
+#                fname = here::here("data-raw","gridded","sst_data", "test_2017.grd"),
+#                region_name = "MAB")
+#
+# get_group_mean(ltm_path = here::here("data-raw","gridded","ltm", "internet_ltm.grd"),
+#                fname = here::here("data-raw","gridded","sst_data", "test_2017.grd"),
+#                shapefiles = ecodata::ESP_sf,
+#                region_name = "atlantic_menhaden_south_spring")
