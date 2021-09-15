@@ -1,0 +1,102 @@
+on:
+  workflow_dispatch:
+  push:
+
+name: Pull satellice temperature data from PSL API
+
+jobs:
+  build1:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Install command line packages
+        run: |
+          sudo apt update
+          sudo apt-get install  libgdal-dev libcurl4-gnutls-dev libgit2-dev libudunits2-dev libharfbuzz-dev libfribidi-dev
+        shell: bash
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@master
+        with:
+          r-version: '4.0.3' # problem with using 4.0.4
+
+      - name: Cache R packages
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ecopull-cache2
+
+      - name: Install packages
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          Rscript -e '
+          install.packages(c("ncdf4", "knitr", "usethis", "raster", "rgdal",
+          "here", "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
+          devtools::install_github("NOAA-EDAB/ecodata")'
+
+      - name: Pull satellite data
+        run: |
+          Rscript -e '
+          devtools::load_all()
+          options(timeout = 600)
+
+          url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
+          download.file(url, "test.nc")
+          message("File size: ", file.size("test.nc"))
+
+          nc <- ncdf4::nc_open("test.nc")
+          message("netcdf object size: ", object.size(nc))
+
+          internet_ltm <- ecopull::nc_to_raster(nc = nc, varnum = 2)
+          message("raster object size: ", object.size(internet_ltm))
+
+          dir.create(here::here("data-raw","gridded", "ltm"), recursive = TRUE)
+          raster::writeRaster(internet_ltm, filename = here::here("data-raw","gridded", "ltm", "internet_ltm.grd"),
+                    overwrite=TRUE)
+          # saveRDS(internet_ltm, file = here::here("data-raw","gridded", "ltm", "internet_ltm.RDS"))
+          ncdf4::nc_close(nc)
+
+          years <- 2010:2016
+
+          for(i in years) {
+            name <- paste0(i, ".nc")
+            dir.create(here::here("data-raw","gridded", "sst_data"), recursive = TRUE)
+            filename <- here::here("data-raw","gridded", "sst_data", paste0("test_", i, ".RDS"))
+
+            url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
+            download.file(url, destfile = name, timeout = 600)
+
+            text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
+                                              test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
+                                              raster::writeRaster(test_{{year}}, filename = filename, overwrite=TRUE)
+                                              # saveRDS(test_{{year}}, file = filename)
+                                              ncdf4::nc_close(nc)",
+                                       year = i)
+
+            # print(text)
+            try(eval(parse(text = text)))
+            print(paste("finished", i))
+
+          }'
+
+      - name: Check directory size
+        run: |
+          cd data-raw
+          du -s
+        shell: bash
+
+      - name: Deploy to Github
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main # The branch the action should deploy to.
+          folder: data-raw # The folder the action should deploy.
+          target-folder: data-raw
+          clean: false # Automatically remove deleted files from the deploy branch
