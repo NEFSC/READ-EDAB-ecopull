@@ -63,7 +63,7 @@ jobs:
           # saveRDS(internet_ltm, file = here::here("data-raw","gridded", "ltm", "internet_ltm.RDS"))
           ncdf4::nc_close(nc)
 
-          years <- 2010:2016
+          years <- 1981:2009
 
           for(i in years) {
             name <- paste0(i, ".nc")
