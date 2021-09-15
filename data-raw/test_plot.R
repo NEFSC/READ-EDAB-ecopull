@@ -111,11 +111,28 @@ ne_anom_plt <- ggplot2::ggplot(data = old,
 ne_anom_plt
 
 
-out_table<- ne_anom %>% rename(Value_new_workflow = Value) %>% left_join(old)
+out_table<- ne_anom %>%
+  rename(Value_new_workflow = Value) %>%
+  left_join(old) %>%
+  dplyr::mutate(Magnitude_difference = abs(Value - Value_new_workflow),
+                Percent_difference = abs(Value - Value_new_workflow) / abs(Value) * 100)
+out_table
 
 write.csv(out_table, file = "comparative_table.csv")
 
-
-
+plt <- ggplot2::ggplot(out_table,
+                       ggplot2::aes(x = Magnitude_difference,
+                                    fill = EPU))+
+  ggplot2::geom_histogram(binwidth = 0.01,
+                          color = "black") +
+  ggplot2::theme_bw() +
+  ggbreak::scale_x_break(c(0.14, 0.98), scales = 2)+
+  ggplot2::xlim(c(0,1.25)) +
+  ggplot2::xlab("Magnitude of difference") +
+  ggplot2::ylim(c(0,11)) +
+  ggplot2::labs(title = "Comparison of old and new OISST anomaly values, 2010-2021") +
+  ggplot2::facet_grid(rows = ggplot2::vars(Var)) #,
+  #                    rows = ggplot2::vars(EPU))
+plt
 
 
