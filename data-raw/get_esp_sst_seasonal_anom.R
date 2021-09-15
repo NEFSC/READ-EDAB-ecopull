@@ -29,7 +29,7 @@ fname <- list.files(here::here("data-raw","gridded","sst_data"),
 ESP_seasonal_oisst_anom <- NULL
 for (e in stock_list2){
   message(e)
-  for (i in 1:length(stock_list2)
+  for (i in 1:length(fname)
        ){
     message(fname[i])
     assign(e, rbind(get(e),
@@ -40,14 +40,14 @@ for (e in stock_list2){
     ESP_seasonal_oisst_anom <- rbind(ESP_seasonal_oisst_anom, get(e))
   }
 }
-ESP_seasonal_oisst_anom
+#ESP_seasonal_oisst_anom
 
 #process output
-# ESP_seasonal_oisst_anom <- ESP_seasonal_oisst_anom %>%
-#   dplyr::mutate(Time = as.numeric(stringr::str_extract(year,"\\d{4}"))) %>%
+ ESP_seasonal_oisst_anom <- ESP_seasonal_oisst_anom %>%
+   dplyr::mutate(Time = as.numeric(stringr::str_extract(year,"\\d{4}"))) %>%
 #                 Var = paste(stringr::str_extract(year, "winter|spring|summer|fall"),"OI SST Anomaly")) %>%
-#   dplyr::select(-year) %>%
-#   dplyr::mutate(Units = "degreesC")
+   dplyr::select(-year) %>%
+   dplyr::mutate(Units = "degreesC")
 
 
 # metadata ----
