@@ -15,6 +15,7 @@ library(ncdf4)
 library(reshape2)
 library(ecodata)
 library(stringr)
+library(rgdal)
 
 
 raw.dir <- here::here("data-raw","gridded","sst_data")
@@ -23,7 +24,7 @@ ltm.dir <- here::here("data-raw","gridded","ltm")
 epu <- ecodata::epu_sf %>%
   filter(EPU != "SS")
 
-
+ltm <- internet_ltm
 seasonal_epu_ltm <- function(ltm, epu_name){
   ltm <- mask(ltm, epu[epu$EPU == epu_name,])
   ltm_out <- mean(ltm@data@values, na.rm = T)
@@ -39,8 +40,8 @@ ltm <- raster::stack(file.path(ltm.dir,seasonal_oisst_anom_nc))
 
 # already rotated and cropped
 #ltm <- raster::stack(nc)
-#ltm <- raster::crop(ltm, extent(280,300,30,50))
-#ltm <- raster::rotate(ltm)
+ltm <- raster::crop(ltm, extent(280,300,30,50))
+ltm <- raster::rotate(ltm)
 
 winter.ltm <- ltm[[1:90]]
 winter.ltm <- raster::stackApply(winter.ltm, indices = rep(1,nlayers(winter.ltm)),mean)
@@ -54,7 +55,7 @@ summer.ltm <- raster::stackApply(summer.ltm, indices = rep(1,nlayers(summer.ltm)
 fall.ltm <- ltm[[274:365]]
 fall.ltm <- raster::stackApply(fall.ltm, indices = rep(1,nlayers(fall.ltm)),mean)
 
-
+fname <- "test_2017.grd"
 #Function to get seasonal averages by year
 
 get_group_mean <- function(fname, epu_name, anom = T){
@@ -67,9 +68,12 @@ get_group_mean <- function(fname, epu_name, anom = T){
   #Get layer index and map to year ----
   message('Getting index')
   year <- NULL
-  for (i in 1:nlayers(raw)){
-    assign("year",rbind(year, data.frame(Time = str_extract(raw[[i]]@data@names,"\\d{4}"))))
-  }
+  #for (i in 1:nlayers(raw)){
+  #  assign("year",rbind(year, data.frame(Time = str_extract(raw[[i]]@data@names,"\\d{4}"))))
+  #}
+  # Get Year column from filename instead of imbeded in data
+  year <- rbind(year, data.frame(Time = rep(c(str_extract(fname,"\\d{4}")), nlayers(raw))))
+
 
   year_split <- year %>%
     dplyr::group_by(Time) %>%
@@ -130,17 +134,17 @@ get_group_mean <- function(fname, epu_name, anom = T){
       message(paste('Finding',season,'SST anomaly for',epu_name))
       sst <- mean(out[[i]]@data@values, na.rm = T) - seasonal_epu_ltm(ltm = get(paste0(season,".ltm")),
                                                                       epu = epu_name)
-      var <- "anomaly"
+      var <- "OISST anomaly"
     } else {
       sst <- mean(out[[i]]@data@values, na.rm = T)
       var <- "absolute"
     }
 
-    year = out@data@names[i]
+    year =  str_extract(out@data@names[i],"\\d{4}")
     df <- data.frame(Value = sst,
                      year = year,
                      EPU = epu_name,
-                     Var = var)
+                     Var = paste(season, var))
 
     assign('mean_sst',rbind(mean_sst, df))
   }
@@ -165,8 +169,8 @@ for (e in epu_list){
 
 #process output
 seasonal_oisst_anom <- rbind(MAB,GOM,GB) %>%
-  dplyr::mutate(Time = as.numeric(stringr::str_extract(year,"\\d{4}")),
-                Var = paste(stringr::str_extract(year, "winter|spring|summer|fall"),"OI SST Anomaly")) %>%
+  dplyr::mutate(Time = as.numeric(year)) %>%
+  #              Var = paste(stringr::str_extract(year, "winter|spring|summer|fall"),"OI SST Anomaly")) %>%
   dplyr::select(-year) %>%
   dplyr::mutate(Units = "degreesC")
 
