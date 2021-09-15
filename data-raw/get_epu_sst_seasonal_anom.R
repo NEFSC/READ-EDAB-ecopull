@@ -24,6 +24,7 @@ ltm.dir <- here::here("data-raw","gridded","ltm")
 epu <- ecodata::epu_sf %>%
   filter(EPU != "SS")
 
+ltm <- internet_ltm
 seasonal_epu_ltm <- function(ltm, epu_name){
   ltm <- mask(ltm, epu[epu$EPU == epu_name,])
   ltm_out <- mean(ltm@data@values, na.rm = T)
