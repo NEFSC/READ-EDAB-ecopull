@@ -45,7 +45,7 @@ jobs:
         run: |
           Rscript -e '
           devtools::load_all()
-          options(timeout = 600)
+          options(timeout = 60 * 60 * 6)
 
           url <- "https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.ltm.1982-2010.nc"
           download.file(url, "test.nc")
@@ -71,7 +71,7 @@ jobs:
             filename <- here::here("data-raw","gridded", "sst_data", paste0("test_", i, ".grd"))
 
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
-            download.file(url, destfile = name, timeout = 600)
+            download.file(url, destfile = name)
 
             text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
                                               test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
