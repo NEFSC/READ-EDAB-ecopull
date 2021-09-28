@@ -1,0 +1,95 @@
+on:
+  workflow_dispatch:
+#  push:
+
+name: Pull most recent 2 years data and calculate time series
+
+jobs:
+
+  build1:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Install command line packages
+        run: |
+          sudo apt update
+          sudo apt-get install  libgdal-dev libcurl4-gnutls-dev libgit2-dev libudunits2-dev libharfbuzz-dev libfribidi-dev
+        shell: bash
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@master
+        with:
+          r-version: '4.0.3' # problem with using 4.0.4
+
+      - name: Cache R packages
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ecopull-cache2
+
+      - name: Install packages
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          Rscript -e '
+          install.packages(c("ncdf4", "knitr", "usethis", "raster", "rgdal",
+          "here", "devtools", "dplyr", "sf", "ggplot2", "reshape2", "stringr"))
+          devtools::install_github("NOAA-EDAB/ecodata")'
+
+      - name: Pull satellite data for most recent 2 years only
+        run: |
+          Rscript -e '
+          devtools::load_all()
+          options(timeout = 60 * 60 * 6)
+
+          current_year <- as.numeric(format(Sys.time(), "%Y"))
+
+          years <- c(current_year - 1, current_year)
+
+          for(i in years) {
+            name <- paste0(i, ".nc")
+            dir.create(here::here("data-raw","gridded", "sst_data"), recursive = TRUE)
+            filename <- here::here("data-raw","gridded", "sst_data", paste0("test_", i, ".grd"))
+
+            url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
+            download.file(url, destfile = name)
+
+            text <- knitr::knit_expand(text = "nc <- ncdf4::nc_open(name)
+                                              test_{{year}} <- ecopull::nc_to_raster(nc = nc, varnum = 1)
+                                              raster::writeRaster(test_{{year}}, filename = filename, overwrite=TRUE)
+                                              ncdf4::nc_close(nc)",
+                                       year = i)
+
+            # print(text)
+            try(eval(parse(text = text)))
+            unlink(name) # remove nc file to save space
+            print(paste("finished", i))
+
+          }'
+
+      - name: Check directory size
+        run: |
+          cd data-raw
+          du -s
+        shell: bash
+
+      - name: Mask satellite data and save
+        run: |
+          Rscript -e '
+          try(source(here::here("data-raw", "get_epu_sst_seasonal_anom.R")))
+          try(source(here::here("data-raw", "get_esp_sst_seasonal_anom.R")))'
+
+      - name: Deploy to Github
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main # The branch the action should deploy to.
+          folder: data # The folder the action should deploy. data-raw will not be deployed at all.
+          target-folder: data
+          clean: false # Automatically remove deleted files from the deploy branch
