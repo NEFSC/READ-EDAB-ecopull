@@ -71,12 +71,13 @@ label <- function(variable,value){
 
 
 
-old<- ecodata::seasonal_oisst_anom %>% dplyr::filter(EPU %in% c("GB","GOM")) %>%
+old<- ecodata::seasonal_oisst_anom %>%
+  dplyr::filter(EPU %in% c("GB","GOM")) %>%
   dplyr::mutate(hline = 0,
                 Var = stringr::str_to_title(stringr::str_extract(Var,"winter|spring|summer|fall")))
 old$Var <- factor(ne_anom$Var, levels= c("Winter","Spring","Summer","Fall"))
 
-ne_anom <- seasonal_oisst_anom %>%
+ne_anom <- ecopull::seasonal_oisst_anom %>%
   dplyr::filter(EPU %in% c("GB","GOM")) %>%
   dplyr::mutate(hline = 0,
                 Var = stringr::str_to_title(stringr::str_extract(Var,"winter|spring|summer|fall")))
@@ -129,10 +130,10 @@ plt <- ggplot2::ggplot(out_table,
   ggbreak::scale_x_break(c(0.14, 0.98), scales = 2)+
   ggplot2::xlim(c(0,1.25)) +
   ggplot2::xlab("Magnitude of difference") +
-  ggplot2::ylim(c(0,11)) +
+  ggplot2::ylim(c(0,35)) +
   ggplot2::labs(title = "Comparison of old and new OISST anomaly values, 2010-2021") +
   ggplot2::facet_grid(rows = ggplot2::vars(Var))
 plt
 
-ggsave("histogram_comparison.png")
+ggsave("histogram_comparison.png", dpi = 72)
 
