@@ -48,6 +48,13 @@ jobs:
           devtools::load_all()
           options(timeout = 60 * 60 * 6)
 
+          # remove any existing yearly data
+
+          folder <- here::here("data-raw/gridded/sst_data")
+          if(dir.exists(folder)) {
+            unlink(folder)
+          }
+
           current_year <- as.numeric(format(Sys.time(), "%Y"))
 
           years <- c(current_year - 1, current_year)
