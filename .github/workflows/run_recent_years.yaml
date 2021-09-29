@@ -47,7 +47,9 @@ jobs:
       - name: Pull satellite data for most recent 2 years only
         run: |
           Rscript -e '
-          devtools::load_all()
+          # install as package
+          devtools::install_github("kimberly-bastille/ecopull")
+
           options(timeout = 60 * 60 * 6)
 
           # remove any existing yearly data
