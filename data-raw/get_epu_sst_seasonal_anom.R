@@ -174,6 +174,9 @@ seasonal_oisst_anom <- rbind(MAB,GOM,GB) %>%
   dplyr::select(-year) %>%
   dplyr::mutate(Units = "degreesC")
 
+seasonal_oisst_anom <- rbind(ecopull::seasonal_oisst_anom,
+                             seasonal_oisst_anom)
+
 
 # metadata ----
 attr(seasonal_oisst_anom, "tech-doc_url") <- "https://noaa-edab.github.io/tech-doc/seasonal-sst-anomalies.html"

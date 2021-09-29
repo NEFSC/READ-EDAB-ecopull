@@ -52,7 +52,8 @@ jobs:
 
           folder <- here::here("data-raw/gridded/sst_data")
           if(dir.exists(folder)) {
-            unlink(folder)
+            unlink(folder, recursive = TRUE)
+            message("Removed existing SST gridded data")
           }
 
           current_year <- as.numeric(format(Sys.time(), "%Y"))
@@ -76,7 +77,7 @@ jobs:
             # print(text)
             try(eval(parse(text = text)))
             unlink(name) # remove nc file to save space
-            print(paste("finished", i))
+            message(paste("finished", i))
 
           }'
 
