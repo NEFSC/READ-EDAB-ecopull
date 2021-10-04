@@ -119,19 +119,19 @@ jobs:
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          branch: atyrell3-patch-1 # The branch the action should deploy to.
 
-      - name: Send pull request to ecodata (test)
-        uses: gha-utilities/init-pull-request@v0.3.2
-        env:
-          GITHUB_REPOSITORY: NOAA-EDAB/ecodata
-        with:
-          verbose: true
-          pull_request_token: ${{ secrets.GITHUB_TOKEN }}
-          head: kimberly-bastille:ecopull
-          base: test
-          title: 'Test actions pull request'
-          body: >
-            Perhaps a multi-line description
-            about latest features and such.
+#      - name: Send pull request to ecodata (test)
+#        uses: gha-utilities/init-pull-request@v0.3.2
+#        env:
+#          GITHUB_REPOSITORY: NOAA-EDAB/ecodata
+#        with:
+#          verbose: true
+#          pull_request_token: ${{ secrets.GITHUB_TOKEN }}
+#          head: kimberly-bastille:ecopull
+#          base: test
+#          title: 'Test actions pull request'
+#          body: >
+#            Perhaps a multi-line description
+#            about latest features and such.
             
       - name: Checkout ecodata repo
         uses: actions/checkout@v2
