@@ -72,7 +72,7 @@ jobs:
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
             download.file(url, destfile = name)
 
-            text <- knitr::knit_expand(text = "test_{{year}} <- ecopull::nc_to_raster(nc = name, varname = "sst")
+            text <- knitr::knit_expand(text = "test_{{year}} <- ecopull::nc_to_raster(nc = name, varname = 'sst')
                                               raster::writeRaster(test_{{year}}, filename = filename, overwrite = TRUE)",
                                        year = i)
 
