@@ -64,6 +64,8 @@ jobs:
 
           years <- c(current_year - 1, current_year)
 
+          varname <- "sst"
+
           for(i in years) {
             name <- paste0(i, ".nc")
             dir.create(here::here("data-raw","gridded", "sst_data"), recursive = TRUE)
@@ -72,7 +74,7 @@ jobs:
             url <- paste0("https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.", i, ".v2.nc")
             download.file(url, destfile = name)
 
-            text <- knitr::knit_expand(text = "test_{{year}} <- ecopull::nc_to_raster(nc = name, varname = 'sst')
+            text <- knitr::knit_expand(text = "test_{{year}} <- ecopull::nc_to_raster(nc = name, varname = varname)
                                               raster::writeRaster(test_{{year}}, filename = filename, overwrite = TRUE)",
                                        year = i)
 
