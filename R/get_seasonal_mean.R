@@ -43,6 +43,7 @@ get_group_mean <- function(ltm_path,
   # already rotated and cropped
   ltm <- raster::crop(ltm, extent(280,300,30,50))
   ltm <- raster::rotate(ltm)
+#  raster::plot(ltm)
 
   winter.ltm <- ltm[[1:90]]
   winter.ltm <- raster::stackApply(winter.ltm, indices = rep(1,nlayers(winter.ltm)),mean)
@@ -93,6 +94,7 @@ get_group_mean <- function(ltm_path,
   #Rotate from 0-360 to -180-180 ----
   message(paste('Rotating',fname))
   raw1 <- raster::rotate(raw)
+#  raster::plot(raw1)
 
   #Split data on layer index - stackApply will break if there are too many layers ----
   g1 <- year_split %>%

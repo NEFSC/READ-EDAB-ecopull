@@ -1,3 +1,5 @@
+### !! Will have to update to work with new ecopull::nc_to_raster before running !! ###
+
 on:
   workflow_dispatch:
 #  push:

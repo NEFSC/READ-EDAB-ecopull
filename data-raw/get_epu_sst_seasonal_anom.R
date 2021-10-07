@@ -41,6 +41,7 @@ ltm <- raster::stack(file.path(ltm.dir,seasonal_oisst_anom_nc))
 #ltm <- raster::stack(nc)
 ltm <- raster::crop(ltm, extent(280,300,30,50))
 ltm <- raster::rotate(ltm)
+#raster::plot(ltm)
 
 winter.ltm <- ltm[[1:90]]
 winter.ltm <- raster::stackApply(winter.ltm, indices = rep(1,nlayers(winter.ltm)),mean)
@@ -63,6 +64,8 @@ get_group_mean <- function(fname, epu_name, anom = T){
   raw <- raster::stack(file.path(raw.dir, fname))
 
   crs(raw) <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+
+#  raster::plot(raw, 1)
 
   #Get layer index and map to year ----
   message('Getting index')
