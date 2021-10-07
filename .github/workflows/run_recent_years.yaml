@@ -145,3 +145,4 @@ jobs:
           path: ecodata
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: test # The branch the action should deploy to.
+          committer: atyrell3 <abigail.tyrell@noaa.gov>
