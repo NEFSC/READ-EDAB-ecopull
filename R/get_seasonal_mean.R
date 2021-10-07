@@ -59,7 +59,7 @@ get_group_mean <- function(ltm_path,
   #Import raster data ----
   raw <- raster::stack(fname)
 
-  crs(raw) <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+  raster::crs(raw) <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 
   #Get layer index and map to year ----
   message('Getting index')
@@ -92,16 +92,16 @@ get_group_mean <- function(ltm_path,
 
   #Rotate from 0-360 to -180-180 ----
   message(paste('Rotating',fname))
-  raw1 <- rotate(raw)
+  raw1 <- raster::rotate(raw)
 
   #Split data on layer index - stackApply will break if there are too many layers ----
   g1 <- year_split %>%
     dplyr::filter(index %in% unique(.$index)[1:10]) %>%
-    pull(index)
+    dplyr::pull(index)
 
   g2 <- year_split %>%
     dplyr::filter(!index %in% unique(.$index)[1:10]) %>%
-    pull(index)
+    dplyr::pull(index)
 
   #Apply and combine ----
   message(paste('Finding mean'))
