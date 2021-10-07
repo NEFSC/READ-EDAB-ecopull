@@ -95,14 +95,14 @@ jobs:
           try(source(here::here("data-raw", "get_epu_sst_seasonal_anom.R")))
           try(source(here::here("data-raw", "get_esp_sst_seasonal_anom.R")))'
 
-#      - name: Send to ecopull
-#        uses: JamesIves/github-pages-deploy-action@4.1.1
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          branch: main # The branch the action should deploy to.
-#          folder: data # The folder the action should deploy. data-raw will not be deployed at all.
-#          target-folder: data
-#          clean: false # Automatically remove deleted files from the deploy branch
+      - name: Send to ecopull
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main # The branch the action should deploy to.
+          folder: data # The folder the action should deploy. data-raw will not be deployed at all.
+          target-folder: data
+          clean: false # Automatically remove deleted files from the deploy branch
 
 #      - name: Send pull request to ecodata (test)
 #        uses: peter-evans/create-pull-request@v3
