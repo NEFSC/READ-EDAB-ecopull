@@ -76,7 +76,7 @@ jobs:
                                               raster::writeRaster(test_{{year}}, filename = filename, overwrite = TRUE)",
                                        year = i)
 
-            # print(text)
+             print(text)
             try(eval(parse(text = text)))
             unlink(name) # remove nc file to save space
             message(paste("finished", i))
