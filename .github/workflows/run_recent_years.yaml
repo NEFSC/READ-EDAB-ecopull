@@ -125,14 +125,14 @@ jobs:
           repository: NOAA-EDAB/ecodata
           path: ecodata
           
-      - name: Send pull request to ecodata (test)
-        uses: gha-utilities/init-pull-request@v0.3.2
-        env:
-          GITHUB_REPOSITORY: NOAA-EDAB/ecodata
-        with:
-          pull_request_token: ${{ secrets.GITHUB_TOKEN }}
-          head: kimberly-bastille:ecopull
-          base: test
+#      - name: Send pull request to ecodata (test)
+#        uses: gha-utilities/init-pull-request@v0.3.2
+#        env:
+#          GITHUB_REPOSITORY: NOAA-EDAB/ecodata
+#        with:
+#          pull_request_token: ${{ secrets.GITHUB_TOKEN }}
+#          head: kimberly-bastille:ecopull
+#          base: test
 
       - name: Send pull request to ecodata (test)
         uses: peter-evans/create-pull-request@v3
