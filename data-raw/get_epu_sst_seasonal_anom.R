@@ -63,7 +63,7 @@ get_group_mean <- function(fname, epu_name, anom = T){
   #Import raster data ----
   raw <- raster::stack(file.path(raw.dir, fname))
 
-  crs(raw) <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+  raster::crs(raw) <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 
 #  raster::plot(raw, 1)
 
@@ -74,13 +74,13 @@ get_group_mean <- function(fname, epu_name, anom = T){
   #  assign("year",rbind(year, data.frame(Time = str_extract(raw[[i]]@data@names,"\\d{4}"))))
   #}
   # Get Year column from filename instead of imbeded in data
-  year <- rbind(year, data.frame(Time = rep(c(str_extract(fname,"\\d{4}")), nlayers(raw))))
+  year <- rbind(year, data.frame(Time = rep(c(stringr::str_extract(fname,"\\d{4}")), raster::nlayers(raw))))
 
 
   year_split <- year %>%
     dplyr::group_by(Time) %>%
-    dplyr::mutate(day = 1:n()) %>%
-    dplyr::mutate(leap = ifelse(n() == 365,"common","leap")) %>%
+    dplyr::mutate(day = 1:dplyr::n()) %>%
+    dplyr::mutate(leap = ifelse(dplyr::n() == 365,"common","leap")) %>%
     dplyr::group_by(leap) %>%
     dplyr::mutate(season = ifelse(day <= 90 & leap == "common", "winter",
                                   ifelse(day > 90 & day <= 181 & leap == "common", "spring",
@@ -100,16 +100,16 @@ get_group_mean <- function(fname, epu_name, anom = T){
 
   #Rotate from 0-360 to -180-180 ----
   message(paste('Rotating',fname))
-  raw1 <- rotate(raw)
+  raw1 <- raster::rotate(raw)
 
   #Split data on layer index - stackApply will break if there are too many layers ----
   g1 <- year_split %>%
     dplyr::filter(index %in% unique(.$index)[1:10]) %>%
-    pull(index)
+    dplyr::pull(index)
 
   g2 <- year_split %>%
     dplyr::filter(!index %in% unique(.$index)[1:10]) %>%
-    pull(index)
+    dplyr::pull(index)
 
   #Apply and combine ----
   message(paste('Finding mean'))
