@@ -48,8 +48,13 @@ for (e in stock_list2){
 #                 Var = paste(stringr::str_extract(year, "winter|spring|summer|fall"),"OI SST Anomaly")) %>%
    dplyr::select(-year) %>%
    dplyr::mutate(Units = "degreesC")
- ESP_seasonal_oisst_anom <- rbind(ecopull::ESP_seasonal_oisst_anom,
-                                  ESP_seasonal_oisst_anom)
+
+
+old_sst <- ecopull::ESP_seasonal_oisst_anom %>%
+   dplyr::filter(!Time %in% years) # years inherits from the github action yaml
+
+ESP_seasonal_oisst_anom <- rbind(old_sst,
+                                 ESP_seasonal_oisst_anom)
 
 
 # metadata ----

@@ -177,7 +177,10 @@ seasonal_oisst_anom <- rbind(MAB,GOM,GB) %>%
   dplyr::select(-year) %>%
   dplyr::mutate(Units = "degreesC")
 
-seasonal_oisst_anom <- rbind(ecopull::seasonal_oisst_anom,
+old_sst <- ecopull::seasonal_oisst_anom %>%
+  dplyr::filter(!Time %in% years) # years inherits from the github action yaml
+
+seasonal_oisst_anom <- rbind(old_sst,
                              seasonal_oisst_anom)
 
 
