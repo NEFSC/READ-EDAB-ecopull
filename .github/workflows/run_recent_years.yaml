@@ -119,11 +119,11 @@ jobs:
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          branch: atyrell3-patch-1 # The branch the action should deploy to.
 
-      - name: Checkout ecodata repo
-        uses: actions/checkout@v2
-        with:
-          repository: NOAA-EDAB/ecodata
-          path: ecodata
+#      - name: Checkout ecodata repo
+#        uses: actions/checkout@v2
+#        with:
+#          repository: NOAA-EDAB/ecodata
+#          path: ecodata
           
 #      - name: Send pull request to ecodata (test)
 #        uses: gha-utilities/init-pull-request@v0.3.2
@@ -134,10 +134,10 @@ jobs:
 #          head: kimberly-bastille:ecopull
 #          base: test
 
-      - name: Send pull request to ecodata (test)
-        uses: peter-evans/create-pull-request@v3
-        with:
-          path: ecodata
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: test # The branch the action should deploy to.
-          committer: atyrell3 <abigail.tyrell@noaa.gov>
+#      - name: Send pull request to ecodata (test)
+#        uses: peter-evans/create-pull-request@v3
+#        with:
+#          path: ecodata
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          branch: test # The branch the action should deploy to.
+#          committer: atyrell3 <abigail.tyrell@noaa.gov>
