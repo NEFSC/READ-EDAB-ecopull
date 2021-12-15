@@ -94,6 +94,9 @@ jobs:
       - name: Mask satellite data and save
         run: |
           Rscript -e '
+          current_year <- as.numeric(format(Sys.time(), "%Y"))
+          years <- c(current_year - 1, current_year)
+
           try(source(here::here("data-raw", "get_epu_sst_seasonal_anom.R")))
           try(source(here::here("data-raw", "get_esp_sst_seasonal_anom.R")))'
 
@@ -124,7 +127,7 @@ jobs:
 #        with:
 #          repository: NOAA-EDAB/ecodata
 #          path: ecodata
-          
+
 #      - name: Send pull request to ecodata (test)
 #        uses: gha-utilities/init-pull-request@v0.3.2
 #        env:
