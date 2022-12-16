@@ -3,12 +3,10 @@
 ### https://www.py4u.net/discuss/881476
 
 # read ncdf file
-nc <- ncdf4::nc_open("../../Downloads/sst.day.mean.ltm.1982-2010.nc")
-
+#nc <- ncdf4::nc_open("../../Downloads/sst.day.mean.ltm.1982-2010.nc")
+nc <- ncdf4::nc_open(file.path(here::here("data-raw/sst.day.mean.ltm.1991-2020.nc")))
 # check which variable to use
 nc$var[[2]]$name
-
-ecopull::nc_to_raster(nc, varnum = 2)
 
 # extract variable name, size and dimension
 v <- nc$var[[2]]
@@ -69,4 +67,4 @@ print(ecodata_ltm)
 
 raster::plot(ltm)
 
-usethis::use_data(ecodata_ltm, overwrite = TRUE)
+usethis::use_data(ltm, overwrite = TRUE)
