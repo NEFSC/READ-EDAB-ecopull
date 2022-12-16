@@ -17,26 +17,29 @@ make_seasonal_oisst <- function(rasterfile,
                                    j == "summer" ~ 273,
                                    j == "fall" ~ 365)
 
-      this_dat <- raster::mask(dat[[day_first:day_last]],
-                               sf::as_Spatial(ecodata::epu_sf[ecodata::epu_sf$EPU == i,]))
+      seasonal_dat <- try(dat[[day_first:day_last]])
+      if(class(seasonal_dat) != "try-error"){
+        this_dat <- raster::mask(dat[[day_first:day_last]],
+                                 sf::as_Spatial(ecodata::epu_sf[ecodata::epu_sf$EPU == i,]))
 
-      # get seasonal mean for each raster cell
-      results <- raster::stackApply(this_dat,
-                                    indices = rep(1, raster::nlayers(this_dat)),
-                                    mean)
+        # get seasonal mean for each raster cell
+        results <- raster::stackApply(this_dat,
+                                      indices = rep(1, raster::nlayers(this_dat)),
+                                      mean)
 
-      # mean all the raster cells to 1 value
-      if(type == "ltm") {
-        results <- tibble::tibble(EPU = i,
-                                  Season = j,
-                                  LTM = mean(results@data@values, na.rm = TRUE))
-      } else if(type == "annual") {
-        results <- tibble::tibble(EPU = i,
-                                  Season = j,
-                                  Mean_temp = mean(results@data@values, na.rm = TRUE),
-                                  Year = as.numeric(stringr::str_extract(rasterfile, "[:digit:]{4}")))
+        # mean all the raster cells to 1 value
+        if(type == "ltm") {
+          results <- tibble::tibble(EPU = i,
+                                    Season = j,
+                                    LTM = mean(results@data@values, na.rm = TRUE))
+        } else if(type == "annual") {
+          results <- tibble::tibble(EPU = i,
+                                    Season = j,
+                                    Mean_temp = mean(results@data@values, na.rm = TRUE),
+                                    Year = as.numeric(stringr::str_extract(rasterfile, "[:digit:]{4}")))
+        }
+        out <- rbind(out, results)
       }
-      out <- rbind(out, results)
     }
   }
   return(out)
