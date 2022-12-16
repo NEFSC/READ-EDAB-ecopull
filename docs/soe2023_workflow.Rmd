@@ -1,0 +1,103 @@
+---
+title: "New workflow for the 2023 SOE OISST indicators"
+author: "Abigail Tyrell"
+date: "12/16/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE)
+devtools::load_all()
+`%>%` <- magrittr::`%>%`
+```
+
+# Rationale
+
+I went back to our code to calculate updated indicators for 2023 and thought... there has to be a better way. The code was too long and complicated for what should be a fairly simple task of calculating seasonal OISST anomalies.
+
+# New seasonal OISST function
+
+The new function `make_seasonal_oisst` takes a raster file name as input. The raster file should have a layer with gridded temperature data for each day. It reads in the file and loops through EPU and season to calculate the mean temperature for each EPU x season. The return value is a tibble.
+
+## Code
+```{r}
+make_seasonal_oisst
+```
+
+# New workflow
+
+## Code
+```{r, results = "markup"}
+readLines(here::here("_targets.R")) %>%
+  cat(sep = "\n")
+```
+
+# Comparison to existing OISST indicators
+
+```{r, echo = FALSE}
+sst_anomaly %>%
+  dplyr::mutate(Var = dplyr::case_when(stringr::str_detect(Var, "winter") ~ "Winter OISST anomaly",
+                                       stringr::str_detect(Var, "spring") ~ "Spring OISST anomaly",
+                                       stringr::str_detect(Var, "summer") ~ "Summer OISST anomaly",
+                                       stringr::str_detect(Var, "fall") ~ "Fall OISST anomaly"),
+                Type = "New method") %>%
+  dplyr::rename(Time = Year) %>%
+  dplyr::full_join(ecodata::seasonal_oisst_anom %>%
+                     dplyr::mutate(Type = "Old method")) %>%
+  dplyr::mutate(Var = Var %>%
+                  stringr::str_remove(" OISST anomaly")) %>%
+  ggplot2::ggplot(ggplot2::aes(x = Time,
+                               y = Value,
+                               color = Type)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line() +
+  ggplot2::facet_grid(rows = ggplot2::vars(Var),
+                      cols = ggplot2::vars(EPU)) +
+  ggplot2::theme_bw()
+```
+
+```{r, echo = FALSE}
+sst_anomaly %>%
+  dplyr::mutate(Var = dplyr::case_when(stringr::str_detect(Var, "winter") ~ "Winter OISST anomaly",
+                                       stringr::str_detect(Var, "spring") ~ "Spring OISST anomaly",
+                                       stringr::str_detect(Var, "summer") ~ "Summer OISST anomaly",
+                                       stringr::str_detect(Var, "fall") ~ "Fall OISST anomaly")) %>%
+  dplyr::rename(Time = Year,
+                New_value = Value) %>%
+  dplyr::full_join(ecodata::seasonal_oisst_anom) %>%
+  dplyr::mutate(Var = Var %>%
+                  stringr::str_remove(" OISST anomaly")) %>%
+  ggplot2::ggplot(ggplot2::aes(x = Time,
+                               y = New_value - Value)) +
+  ggplot2::geom_col(color = "black",
+                    fill = "maroon") +
+  ggplot2::facet_grid(rows = ggplot2::vars(Var),
+                      cols = ggplot2::vars(EPU),
+                      scales = "free") +
+  ggplot2::theme_bw()
+
+```
+
+# OISST anomalies with new long-term mean
+```{r, echo = FALSE}
+new_sst_anomaly %>%
+  dplyr::mutate(Type = "New LTM") %>%
+  dplyr::full_join(sst_anomaly %>%
+                     dplyr::mutate(Type = "Old LTM")) %>%
+  dplyr::mutate(Var = dplyr::case_when(stringr::str_detect(Var, "winter") ~ "Winter OISST anomaly",
+                                       stringr::str_detect(Var, "spring") ~ "Spring OISST anomaly",
+                                       stringr::str_detect(Var, "summer") ~ "Summer OISST anomaly",
+                                       stringr::str_detect(Var, "fall") ~ "Fall OISST anomaly")) %>%
+  dplyr::rename(Time = Year) %>%
+  dplyr::mutate(Var = Var %>%
+                  stringr::str_remove(" OISST anomaly")) %>%
+  ggplot2::ggplot(ggplot2::aes(x = Time,
+                               y = Value,
+                               color = Type)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line() +
+  ggplot2::facet_grid(rows = ggplot2::vars(Var),
+                      cols = ggplot2::vars(EPU)) +
+  ggplot2::theme_bw()
+```
