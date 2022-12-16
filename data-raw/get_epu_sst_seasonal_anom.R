@@ -34,6 +34,7 @@ seasonal_oisst_anom_nc <-"internet_ltm.grd"
 
 #Get long-term mean for anomaly calculation
 ltm <- raster::stack(file.path(ltm.dir,seasonal_oisst_anom_nc))
+ltm <- raster::rotate(ltm)
 
 #ltm <- raster::stack(internet_ltm)
 
@@ -54,6 +55,8 @@ summer.ltm <- raster::stackApply(summer.ltm, indices = rep(1,nlayers(summer.ltm)
 
 fall.ltm <- ltm[[274:365]]
 fall.ltm <- raster::stackApply(fall.ltm, indices = rep(1,nlayers(fall.ltm)),mean)
+
+seasonal_ltm <-
 
 # fname <- "test_2017.grd"
 #Function to get seasonal averages by year
