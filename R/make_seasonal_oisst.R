@@ -8,6 +8,8 @@ make_seasonal_oisst <- function(rasterfile,
   for(i in c("GOM", "GB", "MAB")) {
     for (j in c("winter", "spring", "summer", "fall")) {
 
+### not different!
+
       day_first <- dplyr::case_when(j == "winter" ~ 1,
                                     j == "spring" ~ 91,
                                     j == "summer" ~ 182,
