@@ -52,3 +52,28 @@ make_seasonal_oisst <- function(rasterfile,
 #        FUN = make_annual_means)
 # data.table::rbindlist(test) %>%
 #   tibble::as_tibble()
+
+
+spatial_analysis <- function(raster, # spatial data, one year of data with layers for each day
+                             shape, # shapefile to mask to
+                             timeframe # days of year (vector)
+                             ) {
+  dat <- raster::stack(rasterfile)
+  dat <- raster::rotate(dat)
+
+  seasonal_dat <- try(dat[[timeframe]])
+  if(class(seasonal_dat) != "try-error"){
+    this_dat <- raster::mask(dat[[timeframe]],
+                             sf::as_Spatial(shape))
+
+    # get seasonal mean for each raster cell
+    results <- raster::stackApply(this_dat,
+                                  indices = rep(1, raster::nlayers(this_dat)),
+                                  mean)
+
+    # mean all the raster cells to 1 value
+      results <- tibble::tibble(Mean_temp = mean(results@data@values, na.rm = TRUE),
+                                Year = as.numeric(stringr::str_extract(rasterfile, "[:digit:]{4}")))
+
+  }
+}
