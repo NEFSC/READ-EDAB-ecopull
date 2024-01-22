@@ -12,7 +12,7 @@ tar_source()
 # download new year's sst data and save in folder
 # download from psl, for example:
 # https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.day.mean.2022.v2.nc
-# test_2023 <- ecopull::nc_to_raster(nc = "data-raw/sst.day.mean.2023.nc", varname = "sst")
+# test_2023 <- ecopull::nc_to_raster(nc = "data-raw/sst.day.mean.2023 (1).nc", varname = "sst")
 # raster::writeRaster(test_2023, filename = "data-raw/gridded/sst_data/test_2023.grd", overwrite = TRUE)
 # downloading the .nc from url in the script breaks the file
 
