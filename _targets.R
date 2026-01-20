@@ -13,13 +13,13 @@ tar_source()
 # check ecodata to see if past year fall data also needs to be downloaded
 # might not have made it into last year's report
 
-# test_2024 <- ecopull::nc_to_raster(
-#   nc = "data-raw/sst.day.mean.2024.nc",
+# test_2025 <- ecopull::nc_to_raster(
+#   nc = "data-raw/sst.day.mean.2025.nc",
 #   varname = "sst"
 # )
 # raster::writeRaster(
-#   test_2024,
-#   filename = "data-raw/gridded/sst_data/test_2024.grd",
+#   test_2025,
+#   filename = "data-raw/gridded/sst_data/test_2025.grd",
 #   overwrite = TRUE
 # )
 # downloading the .nc from url in the script breaks the file
