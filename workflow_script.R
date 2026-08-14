@@ -35,10 +35,17 @@ if (!dir.exists(input_folder)) {
 
 annual_mean <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
-  data.in = EDABUtilities::convert_2d_longitude_gridded(list.files(input_folder, full.names = TRUE)),
+  data.in = EDABUtilities::convert_2d_longitude_gridded(list.files(
+    input_folder,
+    full.names = TRUE
+  )),
   file.time = 'annual',
   output.files = NULL,
-  shp.file = ecodata::epu_sf,
+  shp.file = system.file(
+    'data',
+    'EPU_NOESTUARIES.shp',
+    package = 'EDABUtilities'
+  ),
   var.name = "sst",
   area.names = c("MAB", "GB", "GOM", "SS"),
   statistic = 'mean',
@@ -57,7 +64,11 @@ climatology <- EDABUtilities::make_2d_summary_ts(
   ),
   file.time = 'annual',
   output.files = NULL,
-  shp.file = ecodata::epu_sf,
+  shp.file = system.file(
+    'data',
+    'EPU_NOESTUARIES.shp',
+    package = 'EDABUtilities'
+  ),
   var.name = "sst",
   area.names = c("MAB", "GB", "GOM", "SS"),
   statistic = 'mean',
