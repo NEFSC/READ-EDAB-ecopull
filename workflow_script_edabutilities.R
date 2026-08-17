@@ -33,6 +33,7 @@ if (!dir.exists(input_folder)) {
 
 # (1) calculate annual mean by EPU
 
+message("Calculating annual means...")
 annual_mean <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
   data.in = EDABUtilities::convert_2d_longitude_gridded(list.files(
@@ -56,7 +57,7 @@ annual_mean <- EDABUtilities::make_2d_summary_ts(
   terra::as.data.frame(na.rm = FALSE)
 
 # (2) calculate climatology
-
+message("Finished calculating annual means. Calculating climatology...")
 climatology <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
   data.in = EDABUtilities::convert_2d_longitude_gridded(
@@ -79,7 +80,30 @@ climatology <- EDABUtilities::make_2d_summary_ts(
   terra::as.data.frame(na.rm = FALSE)
 
 # (3) calculate anomaly by subtracting climatology
+message("Finished calculating climatology. Calculating anomalies...")
+anomaly <- dplyr::full_join(
+  climatology |>
+    dplyr::select(time, area, value) |>
+    dplyr::mutate(month = lubridate::month(time), day = lubridate::day(time)) |>
+    dplyr::rename(climatology = value) |>
+    dplyr::select(-time),
+  annual_mean |>
+    dplyr::select(time, area, value) |>
+    dplyr::mutate(
+      month = lubridate::month(time),
+      day = lubridate::day(time),
+      year = lubridate::year(time)
+    )
+) |>
+  dplyr::mutate(anom_value = value = climatology) |>
+  dplyr::group_by(year, month, area) |>
+  dplyr::summarise(data_value = mean(value, na.rm = TRUE))
 
 # (4) save to network drive
+message("Finished calculating anomalies. Saving to: ", output_folder)
+write.csv(
+  anomaly,
+  file = file.path(output_folder, paste0("oisst_anomaly_", Sys.Date(), ".csv"))
+)
 
 message('Done: OISST Anomaly')
