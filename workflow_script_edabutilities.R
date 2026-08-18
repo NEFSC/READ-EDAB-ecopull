@@ -37,9 +37,10 @@ check.dir(output_folder)
 if (!dir.exists(input_folder)) {
   stop(paste0('Input directory does not exist: ', input_folder))
 }
-# if (!dir.exists(supp.dir)) {
-#   stop(paste0('Supplemental directory does not exist: ', supp.dir))
-# }
+
+if (!file.exists(ltm_file)) {
+  stop(paste0('Long-term mean file does not exist: ', ltm_file))
+}
 
 # (1) calculate annual mean by EPU
 
@@ -88,7 +89,12 @@ annual_mean_output <- purrr::reduce(
 # (2) calculate climatology
 message("Finished calculating annual means. Calculating climatology...")
 
-cropped_climatilogy <- EDABUtilities::crop_nc_2d(ltm_file)
+cropped_climatilogy <- EDABUtilities::crop_nc_2d(ltm_file,
+                                                 shp.file = system.file(
+                                                   'data',
+                                                   'EPU_NOESTUARIES.shp',
+                                                   package = 'EDABUtilities'
+                                                 ))
 climatology <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
   data.in = cropped_climatilogy,
