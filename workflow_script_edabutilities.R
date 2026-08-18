@@ -13,9 +13,9 @@ if (length(args) > 0) {
   ltm_file = args[3]
   print('Using command line arguments')
 } else {
-  # input_folder = '//nefscdata/EDAB_Datasets/OISST/V2/SOURCE/SST'
-  # output_folder = '//nefscdata/EDAB_Dev/atyrell'
-  # ltm_file = '//nefscdata/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
+  input_folder = '//nefscdata/EDAB_Datasets/OISST/V2/SOURCE/SST'
+  output_folder = '//nefscdata/EDAB_Dev/atyrell'
+  ltm_file = '//nefscdata/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
 
   input_folder = '~/EDAB_Datasets/OISST/V2/SOURCE/SST'
   output_folder = '~/EDAB_Dev/atyrell'
@@ -87,9 +87,11 @@ annual_mean_output <- purrr::reduce(
 
 # (2) calculate climatology
 message("Finished calculating annual means. Calculating climatology...")
+
+cropped_climatilogy <- EDABUtilities::crop_nc_2d(ltm_file)
 climatology <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
-  data.in = EDABUtilities::convert_2d_longitude_gridded(ltm_file),
+  data.in = cropped_climatilogy,
   file.time = 'annual',
   output.files = NULL,
   shp.file = system.file(
