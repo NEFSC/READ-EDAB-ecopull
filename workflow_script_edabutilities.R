@@ -44,12 +44,23 @@ if (!dir.exists(input_folder)) {
 # (1) calculate annual mean by EPU
 
 message("Calculating annual means...")
+files <- EDABUtilities::convert_2d_longitude_gridded(list.files(
+  input_folder,
+  full.names = TRUE
+)[1:3])
+
+cropped_data <- EDABUtilities::crop_nc_2d(
+  files,
+  shp.file = system.file(
+    'data',
+    'EPU_NOESTUARIES.shp',
+    package = 'EDABUtilities'
+  )
+)
+
 annual_mean <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
-  data.in = EDABUtilities::convert_2d_longitude_gridded(list.files(
-    input_folder,
-    full.names = TRUE
-  )[1:3]),
+  data.in = cropped_data,
   file.time = 'annual',
   output.files = NULL,
   shp.file = system.file(
@@ -65,10 +76,13 @@ annual_mean <- EDABUtilities::make_2d_summary_ts(
   write.out = F
 )
 
-annual_mean_output <- purrr::reduce(annual_mean,
-                                    ~ {terra::as.data.frame(.x, na.rm = FALSE)
-                                      dplyr::bind_rows(.x, .y)}
-                                    )
+annual_mean_output <- purrr::reduce(
+  annual_mean,
+  ~ {
+    terra::as.data.frame(.x, na.rm = FALSE)
+    dplyr::bind_rows(.x, .y)
+  }
+)
 
 
 # (2) calculate climatology
@@ -108,11 +122,15 @@ anomaly <- dplyr::full_join(
       year = lubridate::year(time)
     )
 ) |>
-  dplyr::mutate(anom_value = value - climatology,
-                season = dplyr::case_when(month %in% 1:3 ~ "Winter",
-                                          month %in% 4:6 ~ "Spring",
-                                          month %in% 7:9 ~ "Summer",
-                                          month %in% 10:12 ~ "Fall")) |>
+  dplyr::mutate(
+    anom_value = value - climatology,
+    season = dplyr::case_when(
+      month %in% 1:3 ~ "Winter",
+      month %in% 4:6 ~ "Spring",
+      month %in% 7:9 ~ "Summer",
+      month %in% 10:12 ~ "Fall"
+    )
+  ) |>
   dplyr::group_by(year, season, area) |>
   dplyr::summarise(data_value = mean(value, na.rm = TRUE))
 
