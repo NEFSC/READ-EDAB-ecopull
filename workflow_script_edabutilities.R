@@ -19,7 +19,8 @@ if (length(args) > 0) {
 
   input_folder = '~/EDAB_Datasets/OISST/V2/SOURCE/SST'
   output_folder = '~/EDAB_Dev/atyrell'
-  ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
+  # ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
+  ltm_file = '~/SOE_ESP_Data/READ-EDAB-ecopull/data-raw/gridded/ltm/internet_ltm.grd'
 
   message('Using default arguments')
 }
@@ -42,13 +43,13 @@ if (!file.exists(ltm_file)) {
   stop(paste0('Long-term mean file does not exist: ', ltm_file))
 }
 
-# (1) calculate annual mean by EPU
+# (1) calculate annual mean by EPU ----
 
 message("Calculating annual means...")
 files <- EDABUtilities::convert_2d_longitude_gridded(list.files(
   input_folder,
   full.names = TRUE
-)[1:3])
+))
 
 cropped_data <- EDABUtilities::crop_nc_2d(
   files,
@@ -86,18 +87,25 @@ annual_mean_output <- purrr::reduce(
 )
 
 
-# (2) calculate climatology
+# (2) calculate climatology ----
 message("Finished calculating annual means. Calculating climatology...")
 
-cropped_climatilogy <- EDABUtilities::crop_nc_2d(ltm_file,
+## LTM file is breaking the script ----
+rast_stack <- raster::stack(ltm_file)
+spatrast <- terra::rast(rast_stack)
+
+cropped_climatology <- EDABUtilities::crop_nc_2d(spatrast,
                                                  shp.file = system.file(
                                                    'data',
                                                    'EPU_NOESTUARIES.shp',
                                                    package = 'EDABUtilities'
                                                  ))
+# change projection??
+# new_proj <- cropped_climatology$layer_1
+
 climatology <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
-  data.in = cropped_climatilogy,
+  data.in = cropped_climatology,
   file.time = 'annual',
   output.files = NULL,
   shp.file = system.file(
@@ -114,7 +122,16 @@ climatology <- EDABUtilities::make_2d_summary_ts(
 ) |>
   terra::as.data.frame(na.rm = FALSE)
 
-# (3) calculate anomaly by subtracting climatology
+## calculate climatology manually ----
+
+# climatology <- annual_mean_output |>
+#   dplyr::mutate(month = lubridate::month(time), day = lubridate::day(time),
+#                 year = lubridate::year(time)) |>
+#   dplyr::filter(year >=1991 & year <= 2020) |>
+#   dplyr::group_by(month, day, area) |>
+#   dplyr::summarise(climatology = mean(value, na.rm = TRUE))
+
+# (3) calculate anomaly by subtracting climatology ----
 message("Finished calculating climatology. Calculating anomalies...")
 anomaly <- dplyr::full_join(
   climatology |>
@@ -142,7 +159,7 @@ anomaly <- dplyr::full_join(
   dplyr::group_by(year, season, area) |>
   dplyr::summarise(data_value = mean(value, na.rm = TRUE))
 
-# (4) save to network drive
+# (4) save to network drive ----
 message("Finished calculating anomalies. Saving to: ", output_folder)
 write.csv(
   anomaly,
