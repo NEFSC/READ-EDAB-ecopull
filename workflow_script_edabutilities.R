@@ -20,7 +20,7 @@ if (length(args) > 0) {
   input_folder = '~/EDAB_Datasets/OISST/V2/SOURCE/SST'
   output_folder = '~/EDAB_Dev/atyrell'
   # ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
-  ltm_file = '~/SOE_ESP_Data/READ-EDAB-ecopull/data-raw/gridded/ltm/internet_ltm.grd'
+  ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/oisst_clim_test.nc'
 
   message('Using default arguments')
 }
@@ -49,7 +49,7 @@ message("Calculating annual means...")
 files <- EDABUtilities::convert_2d_longitude_gridded(list.files(
   input_folder,
   full.names = TRUE
-))
+)[1:3])
 
 cropped_data <- EDABUtilities::crop_nc_2d(
   files,
@@ -90,18 +90,12 @@ annual_mean_output <- purrr::reduce(
 # (2) calculate climatology ----
 message("Finished calculating annual means. Calculating climatology...")
 
-## LTM file is breaking the script ----
-rast_stack <- raster::stack(ltm_file)
-spatrast <- terra::rast(rast_stack)
-
-cropped_climatology <- EDABUtilities::crop_nc_2d(spatrast,
+cropped_climatology <- EDABUtilities::crop_nc_2d(ltm_file,
                                                  shp.file = system.file(
                                                    'data',
                                                    'EPU_NOESTUARIES.shp',
                                                    package = 'EDABUtilities'
                                                  ))
-# change projection??
-# new_proj <- cropped_climatology$layer_1
 
 climatology <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
@@ -121,15 +115,6 @@ climatology <- EDABUtilities::make_2d_summary_ts(
   write.out = F
 ) |>
   terra::as.data.frame(na.rm = FALSE)
-
-## calculate climatology manually ----
-
-# climatology <- annual_mean_output |>
-#   dplyr::mutate(month = lubridate::month(time), day = lubridate::day(time),
-#                 year = lubridate::year(time)) |>
-#   dplyr::filter(year >=1991 & year <= 2020) |>
-#   dplyr::group_by(month, day, area) |>
-#   dplyr::summarise(climatology = mean(value, na.rm = TRUE))
 
 # (3) calculate anomaly by subtracting climatology ----
 message("Finished calculating climatology. Calculating anomalies...")
