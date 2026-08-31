@@ -51,18 +51,9 @@ files <- EDABUtilities::convert_2d_longitude_gridded(list.files(
   full.names = TRUE
 )[1:3])
 
-cropped_data <- EDABUtilities::crop_nc_2d(
-  files,
-  shp.file = system.file(
-    'data',
-    'EPU_NOESTUARIES.shp',
-    package = 'EDABUtilities'
-  )
-)
-
 annual_mean <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
-  data.in = cropped_data,
+  data.in = files,
   file.time = 'annual',
   output.files = NULL,
   shp.file = system.file(
@@ -90,16 +81,9 @@ annual_mean_output <- purrr::reduce(
 # (2) calculate climatology ----
 message("Finished calculating annual means. Calculating climatology...")
 
-cropped_climatology <- EDABUtilities::crop_nc_2d(ltm_file,
-                                                 shp.file = system.file(
-                                                   'data',
-                                                   'EPU_NOESTUARIES.shp',
-                                                   package = 'EDABUtilities'
-                                                 ))
-
 climatology <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
-  data.in = cropped_climatology,
+  data.in = ltm_file,
   file.time = 'annual',
   output.files = NULL,
   shp.file = system.file(
