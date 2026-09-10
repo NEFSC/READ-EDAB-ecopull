@@ -19,8 +19,8 @@ if (length(args) > 0) {
 
   input_folder = '~/EDAB_Datasets/OISST/V2/SOURCE/SST'
   output_folder = '~/EDAB_Dev/atyrell'
-  # ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
-  ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/oisst_clim_test.nc'
+  ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
+  # ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/oisst_clim_test.nc'
 
   message('Using default arguments')
 }
@@ -77,13 +77,27 @@ annual_mean_output <- purrr::reduce(
   }
 )
 
+# saveRDS(annual_mean_output, here::here("data-raw/annual_mean_output.rds"))
+# annual_mean_output <- readRDS( here::here("data-raw/annual_mean_output.rds"))
+
 
 # (2) calculate climatology ----
 message("Finished calculating annual means. Calculating climatology...")
 
+climatology_file <- EDABUtilities::convert_2d_longitude_gridded(ltm_file)
+
+cropped_clim <- EDABUtilities::crop_nc_2d(
+  climatology_file,
+  shp.file = system.file(
+    'data',
+    'EPU_NOESTUARIES.shp',
+    package = 'EDABUtilities'
+  )
+)
+
 climatology <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
-  data.in = ltm_file,
+  data.in = cropped_clim,
   file.time = 'annual',
   output.files = NULL,
   shp.file = system.file(
