@@ -145,7 +145,7 @@ anomaly <- dplyr::full_join(
     )
   ) |>
   dplyr::group_by(year, season, area) |>
-  dplyr::summarise(data_value = mean(value, na.rm = TRUE))
+  dplyr::summarise(data_value = mean(anom_value, na.rm = TRUE))
 
 # (4) save to network drive ----
 message("Finished calculating anomalies. Saving to: ", output_folder)
