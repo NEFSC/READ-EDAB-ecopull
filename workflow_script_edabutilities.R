@@ -5,34 +5,34 @@
 #Rscript ~/EDAB_Workflows/GLORYS_automation_test.R "~/EDAB_Datasets/OISST/V2/SOURCE/SST" "~/EDAB_Dev/atyrell" "~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc"
 
 #Gets arguments from command line
-args = commandArgs(trailingOnly = TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
   print(args)
-  input_folder = args[1]
-  output_folder = args[2]
-  ltm_file = args[3]
+  input_folder <- args[1]
+  output_folder <- args[2]
+  ltm_file <- args[3]
   print('Using command line arguments')
 } else {
-  input_folder = '//nefscdata/EDAB_Datasets/OISST/V2/SOURCE/SST'
-  output_folder = '//nefscdata/EDAB_Dev/atyrell'
-  ltm_file = '//nefscdata/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
+  input_folder <- '//nefscdata/EDAB_Datasets/OISST/V2/SOURCE/GLOBAL_25KM_DAILY_RAN/SST'
+  output_folder <- '//nefscdata/EDAB_Dev/jcaracappa/OISST_heatwave'
+  ltm_file <- '//nefscdata/EDAB_Datasets/OISST/V2/SOURCE/GLOBAL_25KM_DAILY_RAN/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
 
-  input_folder = '~/EDAB_Datasets/OISST/V2/SOURCE/SST'
-  output_folder = '~/EDAB_Dev/atyrell'
-  ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
+  input_folder <- '~/EDAB_Datasets/OISST/V2/SOURCE/SST'
+  output_folder <- '~/EDAB_Dev/atyrell'
+  ltm_file <- '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/sst.day.mean.ltm.1991-2020.nc'
   # ltm_file = '~/EDAB_Datasets/OISST/V2/SOURCE/SST_LTM/oisst_clim_test.nc'
 
   message('Using default arguments')
 }
 
-pak::pak("NEFSC/READ_EDAB_Utilities@#36/convert_longitude")
+# pak::pak("NEFSC/READ_EDAB_Utilities@#36/convert_longitude")
 
 message(paste0('input_folder: ', input_folder))
 message(paste0('output_folder: ', output_folder))
 
-check.dir = function(file) {
-  if (!dir.exists(dirname(file))) {
-    dir.create(dirname(file), recursive = T)
+check.dir <- function(file) {
+  if (!dir.exists(file)) {
+    dir.create(file, recursive = T)
   }
 }
 
@@ -51,12 +51,14 @@ message("Calculating annual means...")
 files <- EDABUtilities::crop_nc_2d(
   list.files(
     input_folder,
-    full.names = TRUE)[1:3],
+    full.names = TRUE
+  )[1:3],
   shp.file = system.file(
-  'data',
-  'EPU_NOESTUARIES.shp',
-  package = 'EDABUtilities'
-))
+    'data',
+    'EPU_NOESTUARIES.shp',
+    package = 'EDABUtilities'
+  )
+)
 
 annual_mean <- EDABUtilities::make_2d_summary_ts(
   agg.time = "days",
@@ -76,6 +78,56 @@ annual_mean <- EDABUtilities::make_2d_summary_ts(
   write.out = F
 )
 
+epu.names <- c('MAB', 'GB', 'GOM', 'SS')
+out.ls <- list()
+for (i in 1:length(epu.names)) {
+  this.data.rast <- EDABUtilities::make_2d_summary_gridded(
+    data.in = files,
+    write.out = F,
+    shp.file = system.file(
+      'data',
+      'EPU_NOESTUARIES.shp',
+      package = 'EDABUtilities'
+    ),
+    var.name = 'sst',
+    agg.time = 'days',
+    statistic = 'mean',
+    touches = F,
+    file.time = 'daily',
+    area.names = epu.names[i]
+  )
+  out.epu.ls <- list()
+  for (j in 1:length(this.data.rast)) {
+    out.epu.ls[[j]] <- terra::as.data.frame(
+      terra::rast(this.data.rast[j][[1]]),
+      xy = T,
+      time = T,
+      wide = F
+    ) |>
+      dplyr::select(-layer) |>
+      dplyr::group_by(time) |>
+      dplyr::summarise(
+        sst.mean = mean(values, na.rm = T),
+        sst.sd = sd(values, na.rm = T)
+      ) |>
+      dplyr::rename(date = 'time') |>
+      dplyr::mutate(EPU = epu.names[i], source = 'GLORYS')
+  }
+  out.ls[[i]] <- dplyr::bind_rows(out.epu.ls)
+}
+
+daily.epu.heatwave <- dplyr::bind_rows(out.ls)
+
+write.csv(
+  daily.epu.heatwave,
+  file = file.path(
+    output_folder,
+    paste0("oisst_daily_epu_heatwave_", Sys.Date(), ".csv")
+  ),
+  row.names = F
+)
+
+
 annual_mean_output <- purrr::reduce(
   annual_mean,
   ~ {
@@ -86,7 +138,6 @@ annual_mean_output <- purrr::reduce(
 
 # saveRDS(annual_mean_output, here::here("data-raw/annual_mean_output.rds"))
 # annual_mean_output <- readRDS( here::here("data-raw/annual_mean_output.rds"))
-
 
 # (2) calculate climatology ----
 message("Finished calculating annual means. Calculating climatology...")
