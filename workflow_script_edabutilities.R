@@ -110,7 +110,75 @@ append.registry <- function(
   )
 }
 
-# Setup Directories[cite: 2]
+rebuild_registry <- function(
+  registry.file,
+  dir.path,
+  file.prefix,
+  dataset.base.name,
+  mount.dir = ""
+) {
+  if (!dir.exists(dir.path)) {
+    return()
+  }
+
+  existing.files <- list.files(
+    dir.path,
+    pattern = paste0("^", file.prefix),
+    full.names = TRUE
+  )
+  if (length(existing.files) == 0) {
+    return()
+  }
+
+  registry <- read.csv(registry.file)
+
+  for (f in existing.files) {
+    bname <- basename(f)
+
+    # Skip if file is already recorded in the registry
+    if (bname %in% registry$file.name) {
+      next
+    }
+
+    # Infer year for dataset naming and date bounds
+    year.match <- stringr::str_extract(bname, "\\d{4}")
+    if (!is.na(year.match)) {
+      dataset.name <- paste0(dataset.base.name, year.match)
+      input.dates <- as.Date(paste0(year.match, "-01-01"))
+    } else {
+      dataset.name <- dataset.base.name
+      # Fallback for non-annual files like ltm_crop or oisst_anomaly
+      input.dates <- Sys.Date()
+    }
+
+    f.info <- file.info(f)
+
+    reg.entry <- data.frame(
+      dataset.name = dataset.name,
+      mount.dir = mount.dir,
+      sub.dir = dir.path,
+      file.name = bname,
+      run.date = as.Date(f.info$mtime),
+      run.time = f.info$mtime,
+      file.checksum = tools::md5sum(f),
+      start.date = min(input.dates, na.rm = T),
+      end.date = max(input.dates, na.rm = T)
+    )
+
+    write.table(
+      reg.entry,
+      file = registry.file,
+      append = T,
+      sep = ',',
+      col.names = F,
+      row.names = F
+    )
+
+    message('File: ', bname, ' was missing from registry. Now added.')
+  }
+}
+
+# Setup Directories----
 
 mount.dir <- ""
 
@@ -170,21 +238,51 @@ all.input.dates <- as.Date(paste0(input.file.years, "-01-01"))
 # If TRUE reruns old files[cite: 2]
 redo <- F
 
-# Setup Output Directories[cite: 2]
+# Setup Output Directories
 oisst.crop.dir <- paste0(input_folder, 'OISST/V2/PRODUCTS/OISST_NEUS_crop/')
 check.dir(paste0(oisst.crop.dir, "dummy.txt"))
 oisst.crop.prefix <- 'OISST_NEUS_crop_'
+rebuild_registry(
+  registry.file,
+  dir.path = oisst.crop.dir,
+  file.prefix = oisst.crop.prefix,
+  dataset.base.name = "oisst_crop_",
+  mount.dir
+)
 
 annual.mean.dir <- paste0(output_dir_oisst, 'OISST_annual_mean/')
 check.dir(paste0(annual.mean.dir, "dummy.txt"))
 annual.mean.prefix <- 'OISST_annual_mean_'
+rebuild_registry(
+  registry.file,
+  annual.mean.dir,
+  annual.mean.prefix,
+  "annual_mean_",
+  mount.dir
+)
 
 daily.epu.dir <- paste0(output_dir_oisst, 'OISST_daily_epu/')
 check.dir(paste0(daily.epu.dir, "dummy.txt"))
 daily.epu.prefix <- 'OISST_daily_epu_'
+rebuild_registry(
+  registry.file,
+  daily.epu.dir,
+  daily.epu.prefix,
+  "daily_epu_",
+  mount.dir
+)
 
-# Make LTM Climatology Outside loop
-ltm.crop.file <- paste0(dirname(ltm_file), '/NEUS_crop_', basename(ltm_file))
+# Make LTM NES Crop ----
+ltm.crop.dir <- dirname(ltm_file)
+rebuild_registry(
+  registry.file,
+  ltm.crop.dir,
+  "NEUS_crop_",
+  "ltm_crop",
+  mount.dir
+)
+
+ltm.crop.file <- paste0(ltm.crop.dir, '/NEUS_crop_', basename(ltm_file))
 ltm.crop.check <- check.date.file(
   registry.file,
   dataset.name = 'ltm_crop',
@@ -218,6 +316,16 @@ if (ltm.crop.check$same.input.date & ltm.crop.check$file.exists & !redo) {
   }
 }
 
+# LTM Climatology ----
+
+ltm.clim.dir <- output_dir_oisst
+rebuild_registry(
+  registry.file,
+  ltm.clim.dir,
+  "OISST_SOE_climatology_",
+  "ltm_climatology",
+  mount.dir
+)
 ltm.clim.file <- paste0(
   output_dir_oisst,
   'OISST_SOE_climatology_',
@@ -230,6 +338,7 @@ ltm.clim.check <- check.date.file(
   input.dates = all.input.dates,
   mount.dir = ""
 )
+
 
 if (ltm.clim.check$same.input.date & ltm.clim.check$file.exists & !redo) {
   message("LTM climatology already exists and is up to date. Skipping...")
@@ -267,7 +376,7 @@ if (ltm.clim.check$same.input.date & ltm.clim.check$file.exists & !redo) {
   }
 }
 
-# Run through annual files
+# Annual Loop ----
 for (y in 1:length(input.file.years)) {
   year.dates <- as.Date(paste0(input.file.years[y], "-01-01"))
 
