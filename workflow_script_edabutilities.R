@@ -443,27 +443,36 @@ for (y in 1:length(input.file.years)) {
       ". Skipping..."
     )
 
-    oisst.crop.file <- get_recent_file(
+    annual.mean.file <- get_recent_file(
       registry.file,
-      dataset.name = paste0('oisst_crop_', input.file.years[y])
+      dataset.name = paste0('annual_mean_', input.file.years[y])
     )
   } else {
-    EDABUtilities::crop_nc_2d(
-      data.in = input.files[y],
+    EDABUtilities::make_2d_summary_ts(
+      agg.time = "days",
+      data.in = oisst.crop.file,
+      file.time = 'annual',
+      output.files = annual.mean.file,
       shp.file = shp.file,
-      var.name = 'sst',
-      write.out = T,
-      output.files = oisst.crop.file
+      var.name = "sst",
+      area.names = c("MAB", "GB", "GOM", "SS"),
+      statistics.spatial = 'mean',
+      statistic.temporal = 'mean',
+      tz = NA,
+      touches = TRUE,
+      write.out = T
     )
-    message('OISST NES crop written to: ', oisst.crop.file)
-    if (!oisst.crop.check$same.run.date) {
+
+    message('Annual mean for ', input.file.years[y], ' in: ', annual.mean.file)
+
+    if (!annual.mean.check$same.run.date) {
       append.registry(
-        dataset.name = paste0('oisst_crop_', input.file.years[y]),
-        file.name = oisst.crop.file,
+        dataset.name = paste0('annual_mean_', input.file.years[y]),
+        file.name = annual.mean.file,
         registry.file = registry.file,
         input.dates = year.dates,
         mount.dir = mount.dir,
-        sub.dir = oisst.crop.dir
+        sub.dir = annual.mean.dir
       )
     }
   }
