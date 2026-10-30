@@ -204,9 +204,7 @@ if (ltm.crop.check$same.input.date & ltm.crop.check$file.exists & !redo) {
     output.file = ltm.crop.file
   )
 
-
   message('LTM Regional Crop written to: ', ltm.crop.file)
-
 
   if (!ltm.crop.check$same.run.date) {
     append.registry(
@@ -255,7 +253,6 @@ if (ltm.clim.check$same.input.date & ltm.clim.check$file.exists & !redo) {
     write.out = T
   )
 
-
   message('LTM Climatology written to: ', ltm.clim.file)
 
   if (!ltm.clim.check$same.run.date) {
@@ -289,8 +286,6 @@ for (y in 1:length(input.file.years)) {
   )
 
   if (oisst.crop.check$same.input.date & oisst.crop.check$file.exists & !redo) {
-<<<<<<< HEAD
-=======
     message(
       "OISST regional crop already exists for year ",
       input.file.years[y],
@@ -338,7 +333,6 @@ for (y in 1:length(input.file.years)) {
   if (
     annual.mean.check$same.input.date & annual.mean.check$file.exists & !redo
   ) {
-
     message(
       "OISST Annual mean file already exists for year ",
       input.file.years[y],
@@ -415,7 +409,6 @@ for (y in 1:length(input.file.years)) {
       write.out = T
     )
 
-
     message('Annual mean for ', input.file.years[y], ' in: ', annual.mean.file)
 
     if (!annual.mean.check$same.run.date) {
@@ -491,9 +484,7 @@ for (y in 1:length(input.file.years)) {
     daily.epu.heatwave <- dplyr::bind_rows(out.ls)
     write.csv(daily.epu.heatwave, file = daily.epu.file, row.names = F)
 
-
     message('Daily mean for ', input.file.years[y], ' in: ', daily.epu.file)
-
 
     if (!daily.epu.check$same.run.date) {
       append.registry(
@@ -566,11 +557,9 @@ if (
     dplyr::group_by(year, season, area) |>
     dplyr::summarise(data_value = mean(anom_value, na.rm = TRUE))
 
-
   write.csv(anomaly, file = oisst.anomaly.file, row.names = F)
 
   message("OISST Anomaly Indicator written to: ", oisst.anomaly.file)
-
 
   if (!oisst.anomaly.check$same.run.date) {
     append.registry(
@@ -620,7 +609,6 @@ if (heatwave.check$same.input.date & heatwave.check$file.exists & !redo) {
 
   write.csv(daily.epu.out, daily.epu.heatwave.file, row.names = F)
 
-
   message("OISST Daily EPU Indicator written to: ", daily.epu.heatwave.file)
 
   if (!heatwave.check$same.run.date) {
@@ -634,7 +622,5 @@ if (heatwave.check$same.input.date & heatwave.check$file.exists & !redo) {
     )
   }
 
-
   message('OISST Daily EPU Heatwave Done...')
-
 }
