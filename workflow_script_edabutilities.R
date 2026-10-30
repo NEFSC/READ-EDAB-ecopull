@@ -31,7 +31,7 @@ get_recent_file <- function(registry.file, dataset.name) {
   dataset.files <- registry[registry$dataset.name == dataset.name, ]
   recent.entry <- dataset.files[which.max(as.Date(dataset.files$run.time)), ]
   recent.file <- paste0(
-    recent.entry$mount.dir,
+    ifelse(is.na(recent.entry$mount.dir), '', recent.entry$mount.dir),
     recent.entry$sub.dir,
     recent.entry$file.name
   )
@@ -292,7 +292,6 @@ ltm.crop.check <- check.date.file(
 
 if (ltm.crop.check$same.input.date & ltm.crop.check$file.exists & !redo) {
   message("LTM regional crop already exists and is up to date. Skipping...")
-  ltm.crop.file <- get_recent_file(registry.file, dataset.name = 'ltm_crop')
 } else {
   EDABUtilities::crop_nc_2d(
     data.in = ltm_file,
@@ -342,10 +341,6 @@ ltm.clim.check <- check.date.file(
 
 if (ltm.clim.check$same.input.date & ltm.clim.check$file.exists & !redo) {
   message("LTM climatology already exists and is up to date. Skipping...")
-  ltm.clim.file <- get_recent_file(
-    registry.file,
-    dataset.name = 'ltm_climatology'
-  )
 } else {
   EDABUtilities::make_2d_summary_ts(
     agg.time = "days",
@@ -473,65 +468,6 @@ for (y in 1:length(input.file.years)) {
     }
   }
 
-  # Calculate annual mean by EPU ----
-  message("Calculating daily mean by EPU...")
-  annual.mean.file <- paste0(
-    annual.mean.dir,
-    annual.mean.prefix,
-    input.file.years[y],
-    '.rds'
-  )
-
-  annual.mean.check <- check.date.file(
-    registry.file,
-    dataset.name = paste0('annual_mean_', input.file.years[y]),
-    input.dates = year.dates,
-    mount.dir = ""
-  )
-
-  if (
-    annual.mean.check$same.input.date & annual.mean.check$file.exists & !redo
-  ) {
-    message(
-      "OISST Annual mean file already exists for year ",
-      input.file.years[y],
-      ". Skipping..."
-    )
-
-    annual.mean.file <- get_recent_file(
-      registry.file,
-      dataset.name = paste0('annual_mean_', input.file.years[y])
-    )
-  } else {
-    EDABUtilities::make_2d_summary_ts(
-      agg.time = "days",
-      data.in = oisst.crop.file,
-      file.time = 'annual',
-      output.files = annual.mean.file,
-      shp.file = shp.file,
-      var.name = "sst",
-      area.names = c("MAB", "GB", "GOM", "SS"),
-      statistics.spatial = 'mean',
-      statistic.temporal = 'mean',
-      tz = NA,
-      touches = TRUE,
-      write.out = T
-    )
-
-    message('Annual mean for ', input.file.years[y], ' in: ', annual.mean.file)
-
-    if (!annual.mean.check$same.run.date) {
-      append.registry(
-        dataset.name = paste0('annual_mean_', input.file.years[y]),
-        file.name = annual.mean.file,
-        registry.file = registry.file,
-        input.dates = year.dates,
-        mount.dir = mount.dir,
-        sub.dir = annual.mean.dir
-      )
-    }
-  }
-
   # Calculate Daily mean by EPU ----
   epu.names <- c('MAB', 'GB', 'GOM', 'SS')
   daily.epu.file <- file.path(
@@ -625,10 +561,6 @@ if (
   oisst.anomaly.check$same.input.date & oisst.anomaly.check$file.exists & !redo
 ) {
   message('OISST Anomaly already exists and is up to date. Skipping...')
-  oisst.anomaly.file <- get_recent_file(
-    registry.file,
-    dataset.name = 'oisst_anomaly'
-  )
 } else {
   annual.mean.files <- list.files(
     pattern = annual.mean.prefix,
