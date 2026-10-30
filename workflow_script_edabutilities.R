@@ -152,6 +152,7 @@ if (!file.exists(registry.file)) {
   message('Registry File Written to: ', registry.file)
 }
 
+
 # Input Definitions[cite: 2]
 shp.file <- system.file(
   'data',
@@ -203,7 +204,9 @@ if (ltm.crop.check$same.input.date & ltm.crop.check$file.exists & !redo) {
     output.file = ltm.crop.file
   )
 
+
   message('LTM Regional Crop written to: ', ltm.crop.file)
+
 
   if (!ltm.crop.check$same.run.date) {
     append.registry(
@@ -252,7 +255,9 @@ if (ltm.clim.check$same.input.date & ltm.clim.check$file.exists & !redo) {
     write.out = T
   )
 
+
   message('LTM Climatology written to: ', ltm.clim.file)
+
   if (!ltm.clim.check$same.run.date) {
     append.registry(
       dataset.name = 'ltm_climatology',
@@ -284,11 +289,62 @@ for (y in 1:length(input.file.years)) {
   )
 
   if (oisst.crop.check$same.input.date & oisst.crop.check$file.exists & !redo) {
+<<<<<<< HEAD
+=======
     message(
       "OISST regional crop already exists for year ",
       input.file.years[y],
       ". Skipping..."
     )
+    oisst.crop.file <- get_recent_file(
+      registry.file,
+      dataset.name = paste0('oisst_crop_', input.file.years[y])
+    )
+  } else {
+    EDABUtilities::crop_nc_2d(
+      data.in = input.files[y],
+      shp.file = shp.file,
+      write.out = T,
+      output.files = oisst.crop.file
+    )
+    if (!oisst.crop.check$same.run.date) {
+      append.registry(
+        dataset.name = paste0('oisst_crop_', input.file.years[y]),
+        file.name = oisst.crop.file,
+        registry.file = registry.file,
+        input.dates = year.dates,
+        mount.dir = mount.dir,
+        sub.dir = oisst.crop.dir
+      )
+    }
+  }
+
+  # Calculate annual mean by EPU ----
+  message("Calculating daily mean by EPU...")
+  annual.mean.file <- paste0(
+    annual.mean.dir,
+    annual.mean.prefix,
+    input.file.years[y],
+    '.rds'
+  )
+
+  annual.mean.check <- check.date.file(
+    registry.file,
+    dataset.name = paste0('annual_mean_', input.file.years[y]),
+    input.dates = year.dates,
+    mount.dir = ""
+  )
+
+  if (
+    annual.mean.check$same.input.date & annual.mean.check$file.exists & !redo
+  ) {
+
+    message(
+      "OISST Annual mean file already exists for year ",
+      input.file.years[y],
+      ". Skipping..."
+    )
+
     oisst.crop.file <- get_recent_file(
       registry.file,
       dataset.name = paste0('oisst_crop_', input.file.years[y])
@@ -338,6 +394,7 @@ for (y in 1:length(input.file.years)) {
       input.file.years[y],
       ". Skipping..."
     )
+
     annual.mean.file <- get_recent_file(
       registry.file,
       dataset.name = paste0('annual_mean_', input.file.years[y])
@@ -358,7 +415,9 @@ for (y in 1:length(input.file.years)) {
       write.out = T
     )
 
+
     message('Annual mean for ', input.file.years[y], ' in: ', annual.mean.file)
+
     if (!annual.mean.check$same.run.date) {
       append.registry(
         dataset.name = paste0('annual_mean_', input.file.years[y]),
@@ -432,7 +491,9 @@ for (y in 1:length(input.file.years)) {
     daily.epu.heatwave <- dplyr::bind_rows(out.ls)
     write.csv(daily.epu.heatwave, file = daily.epu.file, row.names = F)
 
+
     message('Daily mean for ', input.file.years[y], ' in: ', daily.epu.file)
+
 
     if (!daily.epu.check$same.run.date) {
       append.registry(
@@ -505,9 +566,11 @@ if (
     dplyr::group_by(year, season, area) |>
     dplyr::summarise(data_value = mean(anom_value, na.rm = TRUE))
 
+
   write.csv(anomaly, file = oisst.anomaly.file, row.names = F)
 
   message("OISST Anomaly Indicator written to: ", oisst.anomaly.file)
+
 
   if (!oisst.anomaly.check$same.run.date) {
     append.registry(
@@ -557,6 +620,7 @@ if (heatwave.check$same.input.date & heatwave.check$file.exists & !redo) {
 
   write.csv(daily.epu.out, daily.epu.heatwave.file, row.names = F)
 
+
   message("OISST Daily EPU Indicator written to: ", daily.epu.heatwave.file)
 
   if (!heatwave.check$same.run.date) {
@@ -570,5 +634,7 @@ if (heatwave.check$same.input.date & heatwave.check$file.exists & !redo) {
     )
   }
 
+
   message('OISST Daily EPU Heatwave Done...')
+
 }
