@@ -297,6 +297,7 @@ for (y in 1:length(input.file.years)) {
     EDABUtilities::crop_nc_2d(
       data.in = input.files[y],
       shp.file = shp.file,
+      var.name = 'sst',
       write.out = T,
       output.files = oisst.crop.file
     )
